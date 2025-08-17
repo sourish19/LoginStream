@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import DashboardLayout from '@/layouts/DashboardLayout'
+import AuthLayout from '@/layouts/AuthLayout'
 
 import Navbar from '@/components/Navbar'
 
@@ -15,8 +16,24 @@ import VerifyEmail from '@/pages/VerifyEmail'
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path='/signup' element={<Signup />} />
-      <Route path='/signin' element={<Signin />} />
+      <Route
+        path='/signup'
+        element={
+          <AuthLayout>
+            {' '}
+            <Signup />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path='/signin'
+        element={
+          <AuthLayout>
+            {' '}
+            <Signin />
+          </AuthLayout>
+        }
+      />
       <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='reset-password' element={<ResetPassword />} />
       <Route path='/verify-email' element={<VerifyEmail />} />
@@ -24,7 +41,6 @@ const AppRoutes = () => {
         path='/'
         element={
           <DashboardLayout>
-            <Navbar />
             <Home />
           </DashboardLayout>
         }

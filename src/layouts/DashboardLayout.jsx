@@ -1,4 +1,5 @@
 import React from 'react'
+import Navbar from '../components/Navbar'
 
 const DashboardLayout = ({ children }) => {
   return (
@@ -13,6 +14,7 @@ const DashboardLayout = ({ children }) => {
           backgroundSize: '20px 20px'
         }}
       />
+      <Navbar />
       {children}
     </div>
   )
