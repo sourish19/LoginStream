@@ -4,18 +4,18 @@ import { KeyRound, Mail, LogOut } from 'lucide-react'
 
 const Home = () => {
   return (
-    <div className='text-white h-screen w-full relative z-1 flex flex-col'>
+    <div className='relative z-1 mt-40 flex h-screen w-full flex-col text-white'>
       <div className='text-center'>
-        <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-1 sm:mb-3'>
-          <span className='font-medium  transition-all duration-300'>Welcome User</span>
+        <h1 className='mb-1 text-3xl font-bold tracking-tight sm:mb-3 sm:text-4xl md:text-5xl lg:text-6xl'>
+          <span className='font-medium transition-all duration-300'>Welcome User</span>
         </h1>
-        <h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold tracking-tight text-center'>
-          <span className='bg-gradient-to-r bg-[200%_auto] bg-clip-text leading-tight text-transparent transition-all duration-300 from-neutral-100 via-slate-400 to-neutral-400'>
-            You are securely logged in with <span className='border-b-3 border-blue-400 pb-1'>LoginStream</span>
+        <h2 className='text-center text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl lg:text-4xl'>
+          <span className='bg-gradient-to-r from-neutral-100 via-slate-400 to-neutral-400 bg-[200%_auto] bg-clip-text leading-tight text-transparent transition-all duration-300'>
+            You are securely logged in with LoginStream
           </span>
         </h2>
       </div>
-      <div className='flex flex-wrap flex-col sm:flex-row md:flex-row mt-10 gap-5 mx-auto'>
+      <div className='mx-auto mt-10 flex flex-col flex-wrap gap-5 sm:flex-row md:flex-row'>
         {' '}
         <Cotainer
           title='Reset Password'

@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom'
 
 import DashboardLayout from '@/layouts/DashboardLayout'
 
+import Navbar from '@/components/Navbar'
+
 import Home from '@/pages/Home'
 import Signin from '@/pages/Signin'
 import Signup from '@/pages/Signup'
@@ -22,6 +24,7 @@ const AppRoutes = () => {
         path='/'
         element={
           <DashboardLayout>
+            <Navbar />
             <Home />
           </DashboardLayout>
         }

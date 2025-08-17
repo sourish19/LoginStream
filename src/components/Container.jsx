@@ -4,7 +4,7 @@ import { Button } from './ui/button'
 
 const Cotainer = ({ title, description, Component }) => {
   return (
-    <Card className={'w-[300px]'}>
+    <Card className={'w-[300px] transition-all duration-300'}>
       <CardHeader>
         <CardTitle>
           <div className='flex items-center gap-2'>
@@ -14,7 +14,9 @@ const Cotainer = ({ title, description, Component }) => {
         </CardTitle>
         <CardDescription>{description}</CardDescription>
         <CardAction>
-          <Button className={"cursor-pointer"} variant='link'>Click Here</Button>
+          <Button className={'cursor-pointer'} variant='link'>
+            Click Here
+          </Button>
         </CardAction>
       </CardHeader>
     </Card>
