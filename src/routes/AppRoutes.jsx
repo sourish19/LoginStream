@@ -1,6 +1,8 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
+import DashboardLayout from '@/layouts/DashboardLayout'
+
 import Home from '@/pages/Home'
 import Signin from '@/pages/Signin'
 import Signup from '@/pages/Signup'
@@ -16,7 +18,14 @@ const AppRoutes = () => {
       <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='reset-password' element={<ResetPassword />} />
       <Route path='/verify-email' element={<VerifyEmail />} />
-      <Route path='/' element={<Home />} />
+      <Route
+        path='/'
+        element={
+          <DashboardLayout>
+            <Home />
+          </DashboardLayout>
+        }
+      />
     </Routes>
   )
 }
