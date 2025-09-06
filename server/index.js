@@ -5,8 +5,8 @@ import cors from 'cors';
 
 const app = express();
 
-app.use(urlencoded({extended: true}))
-app.use(cookieParser())
+app.use(urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 8000;
 
