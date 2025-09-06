@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
+import ApiError from './apiError.util';
 
 export const generateHashedToken = () => {
   const token = crypto.randomBytes(32).toString('hex');
@@ -8,9 +9,11 @@ export const generateHashedToken = () => {
   return { token };
 };
 
-export const hashPassword = async (password) => {
+export const generateHashedPassword = async (password) => {
   if (!password) return null;
   const salt = 10;
-  const hashedPassword = await bcrypt.hash(password, salt);
-  return hashedPassword;
+  try {
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword;
+  } catch (error) {}
 };

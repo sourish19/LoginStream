@@ -30,7 +30,7 @@ export const sendEmail = async (options) => {
     const emailText = mailGenerator.generatePlaintext(options.mailgenContent);
 
     const mail = {
-      from: EMAIL.emailFrom || 'mail@BookBazar.app',
+      from: EMAIL.emailFrom,
       to: options.email,
       subject: options.subject,
       text: emailText,
@@ -76,4 +76,4 @@ export const resetPasswordMailgenContent = (username, resetUrl) => ({
     outro:
       'If you did not request a password reset, please ignore this email or contact support if you have concerns.',
   },
-}); 
+});
