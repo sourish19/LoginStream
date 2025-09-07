@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import Mailgen from 'mailgen';
 
-import { EMAIL } from './constants.util.js';
+import { EMAIL_CONSTANTS } from './constants.util.js';
 import logger from '../logger/winston.logger.js';
 
 const mailGenerator = new Mailgen({
@@ -16,12 +16,12 @@ const mailGenerator = new Mailgen({
 });
 
 const transporter = nodemailer.createTransport({
-  host: EMAIL.emailHost,
-  port: parseInt(EMAIL.emailPort, 10),
+  host: EMAIL_CONSTANTS.emailHost,
+  port: parseInt(EMAIL_CONSTANTS.emailPort, 10),
   secure: false,
   auth: {
-    user: EMAIL.authUser,
-    pass: EMAIL.authPass,
+    user: EMAIL_CONSTANTS.authUser,
+    pass: EMAIL_CONSTANTS.authPass,
   },
 });
 
@@ -31,7 +31,7 @@ export const sendEmail = async (options) => {
     const emailText = mailGenerator.generatePlaintext(options.mailgenContent);
 
     const mail = {
-      from: EMAIL.emailFrom,
+      from: EMAIL_CONSTANTS.emailFrom,
       to: options.email,
       subject: options.subject,
       text: emailText,
