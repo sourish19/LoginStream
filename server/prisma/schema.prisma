@@ -1,10 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id                           String    @id @default(cuid())
-  username                     String
-  email                        String    @unique
-  password                     String
-  refreshToken                 String?
-  isVerified                   Boolean   @default(false)
-  emailVerificationToken       String?
-  emailVerificationTokenExpiry DateTime?
-  resetPasswordToken           String?
-  resetPasswordTokenExpiry     DateTime?
-  createdAt                    DateTime  @default(now())
-  updatedAt                    DateTime  @updatedAt
+  id                         String    @id @default(cuid())
+  name                       String
+  email                      String    @unique
+  password                   String
+  refreshToken               String?
+  isVerified                 Boolean   @default(false)
+  emailVerificationOtp       String?
+  emailVerificationOtpExpiry DateTime?
+  resetPasswordOtp           String?
+  resetPasswordOtpExpiry     DateTime?
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
 }
+
+// For scalling to production standard make a different token schema but for time being keeping it in same schema 

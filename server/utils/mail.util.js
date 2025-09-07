@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import Mailgen from 'mailgen';
 
 import { EMAIL } from './constants.util.js';
+import logger from '../logger/winston.logger.js';
 
 const mailGenerator = new Mailgen({
   theme: 'default',
@@ -38,30 +39,22 @@ export const sendEmail = async (options) => {
     };
 
     await transporter.sendMail(mail);
-    console.log('Email sent to:', options.email);
+    logger.info(`Email sent to: ${options.email}`);
   } catch (error) {
     // Fail silently
-    console.error('Email service failed:', error.message);
+    logger.error(`Email service failed: ${error.message}`);
   }
 };
 
-export const emailVerificationMailgenContent = (username, verificationUrl) => ({
+export const emailVerificationMailgenContent = (username, otp) => ({
   body: {
     name: username,
     intro: "Welcome to our app! We're very excited to have you on board.",
-    action: {
-      instructions: 'To verify your email, click the button below:',
-      button: {
-        color: '#22BC66',
-        text: 'Verify Email',
-        link: verificationUrl,
-      },
-    },
-    outro: "Need help? Just reply to this email. We're here to help.",
+    outro: `To verify your email, use the following OTP: **${otp}**. It will expire in 5 minutes.`,
   },
 });
 
-export const resetPasswordMailgenContent = (username, resetUrl) => ({
+export const resetPasswordMailgenContent = (username, resetOtpl) => ({
   body: {
     name: username,
     intro: 'You recently requested to reset your password.',
@@ -70,7 +63,7 @@ export const resetPasswordMailgenContent = (username, resetUrl) => ({
       button: {
         color: '#22BC66',
         text: 'Reset Password',
-        link: resetUrl,
+        link: resetOtpl,
       },
     },
     outro:
