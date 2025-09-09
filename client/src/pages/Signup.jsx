@@ -40,7 +40,10 @@ const Signup = () => {
             Continue with Google
           </Button>
           <CardDescription>
-            Already have an account? <Button className={"cursor-pointer"} variant='link'>Signin</Button>
+            Already have an account?{' '}
+            <Button className={'cursor-pointer'} variant='link'>
+              Signin
+            </Button>
           </CardDescription>
         </CardFooter>
       </Card>

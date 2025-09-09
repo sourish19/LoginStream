@@ -1,6 +1,6 @@
 import React from 'react'
 import Cotainer from '@/components/Container'
-import { KeyRound, Mail, LogOut } from 'lucide-react'
+import { KeyRound, LogOut } from 'lucide-react'
 import Wave from '../assets/wave.png'
 
 const Home = () => {
@@ -24,11 +24,6 @@ const Home = () => {
           title='Reset Password'
           description='Securely update your account password.'
           Component={<KeyRound />}
-        />{' '}
-        <Cotainer
-          title='Verify Email'
-          description='Confirm your email to activate your account.'
-          Component={<Mail />}
         />{' '}
         <Cotainer title='Logout' description='Sign out from your account safely.' Component={<LogOut />} />{' '}
       </div>

@@ -39,7 +39,10 @@ const Signin = () => {
             Continue with Google
           </Button>
           <CardDescription>
-            Don't have an account? <Button className={"cursor-pointer"} variant='link'>Signup</Button>
+            Don't have an account?{' '}
+            <Button className={'cursor-pointer'} variant='link'>
+              Signup
+            </Button>
           </CardDescription>
         </CardFooter>
       </Card>
