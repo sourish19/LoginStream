@@ -25,6 +25,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ * Send email using nodemailer
+ * @async
+ * @function sendEmail
+ * @param {Object} options - Email options
+ * @param {string} options.email - Recipient email address
+ * @param {string} options.subject - Email subject
+ * @param {Object} options.mailgenContent - Mailgen content object
+ * @returns {Promise<void>} Sends email
+ */
 export const sendEmail = async (options) => {
   try {
     const emailHtml = mailGenerator.generate(options.mailgenContent);
@@ -46,6 +56,13 @@ export const sendEmail = async (options) => {
   }
 };
 
+/**
+ * Generate email verification mailgen content
+ * @function emailVerificationMailgenContent
+ * @param {string} username - User's name
+ * @param {string} otp - OTP code
+ * @returns {Object} Mailgen content object
+ */
 export const emailVerificationMailgenContent = (username, otp) => ({
   body: {
     name: username,
@@ -54,7 +71,14 @@ export const emailVerificationMailgenContent = (username, otp) => ({
   },
 });
 
-export const resetPasswordMailgenContent = (username, resetOtpl) => ({
+/**
+ * Generate reset password mailgen content
+ * @function resetPasswordMailgenContent
+ * @param {string} username - User's name
+ * @param {string} resetOtp - Reset OTP or link
+ * @returns {Object} Mailgen content object
+ */
+export const resetPasswordMailgenContent = (username, resetOtp) => ({
   body: {
     name: username,
     intro: 'You recently requested to reset your password.',
@@ -63,7 +87,7 @@ export const resetPasswordMailgenContent = (username, resetOtpl) => ({
       button: {
         color: '#22BC66',
         text: 'Reset Password',
-        link: resetOtpl,
+        link: resetOtp,
       },
     },
     outro:

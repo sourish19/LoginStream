@@ -5,36 +5,50 @@ import ApiResponse from '../utils/apiResponse.util.js';
 import {
   generateEmailVerificationOTP,
   generateHashedPassword,
-  comparePassword,
-  generateRefreshAccessToken
+  compareHash,
+  generateRefreshAccessToken,
 } from '../utils/helper.util.js';
 import logger from '../logger/winston.logger.js';
 import {
   sendEmail,
   emailVerificationMailgenContent,
 } from '../utils/mail.util.js';
-import { cookiesOption } from '../utils/constants.util.js';
+import { cookieOptions } from '../utils/constants.util.js';
+import sanitizeUser from '../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
+/**
+ * Register a new user
+ * @async
+ * @function registerUser
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing user data
+ * @param {string} req.body.name - User's name
+ * @param {string} req.body.email - User's email
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends registration response
+ */
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  logger.info(
-    `name email password in register controller: ${name} ${email} ${password}`
-  );
+  logger.info(`Register attempt: name=${name}, email=${email}`);
 
   const existingUser = await prisma.user.findUnique({
     where: {
       email,
     },
+    select: {
+      name: true,
+      email: true,
+      isVerified: true,
+    },
   });
 
   if (existingUser) {
-    logger.error(`existingUser in register controller:`, {
-      user: existingUser,
-    });
-    throw new ApiError(409, 'User registration failed', []);
+    logger.error(`User already exists with email: ${email}`);
+    throw new ApiError(409, 'User with this email already exists', {});
   }
 
   const hashedPassword = await generateHashedPassword(password);
@@ -50,11 +64,199 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (!newUser) {
-    logger.erroe(`newUser failed in register controller: ${newUser}`);
-    throw new ApiError(500, 'User registration failed', []);
+    logger.error('Failed to create new user in database');
+    throw new ApiError(
+      500,
+      'User registration failed. Please try again later.',
+      {}
+    );
   }
 
-  const { unhashedOtp, hashedOtp, otpExpiry } = await generateEmailVerificationOTP();
+  const sanitizedUser = sanitizeUser(newUser);
+
+  res
+    .status(201)
+    .json(new ApiResponse(201, 'User registered successfully', sanitizedUser));
+});
+
+/**
+ * Login an existing user
+ * @async
+ * @function loginUser
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing login data
+ * @param {string} req.body.email - User's email
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends login response with tokens
+ */
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  logger.info(`Login attempt: email=${email}`);
+
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      password: true,
+      isVerified: true,
+      tokenVersion: true,
+    },
+  });
+
+  if (!findUser) {
+    logger.warn(`Login attempt with non-existent email: ${email}`);
+    throw new ApiError(401, 'Invalid email or password', {});
+  }
+
+  if (!findUser.isVerified) {
+    logger.warn(`Login attempt with unverified email: ${email}`);
+    throw new ApiError(401, 'Please verify your email before logging in', {});
+  }
+
+  const passwordValid = await compareHash(password, findUser.password);
+
+  if (!passwordValid) {
+    logger.warn(`Invalid password attempt for email: ${email}`);
+    throw new ApiError(401, 'Invalid email or password', {});
+  }
+
+  const { accessToken, refreshToken } = generateRefreshAccessToken(
+    findUser.id,
+    findUser.tokenVersion
+  );
+
+  logger.debug(`accessToken issued for user ${findUser.email}`);
+
+  const sanitizedUser = sanitizeUser(findUser);
+
+  res
+    .status(200)
+    .cookie('refreshToken', refreshToken, cookieOptions.options)
+    .cookie('accessToken', accessToken, cookieOptions.options)
+    .json(new ApiResponse(200, 'User login successful', sanitizedUser));
+});
+
+/**
+ * Verify email OTP for user registration
+ * @async
+ * @function verifyOTP
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing OTP data
+ * @param {string} req.body.otp - OTP code to verify
+ * @param {string} req.body.email - User's email
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends verification response
+ */
+export const verifyOTP = asyncHandler(async (req, res) => {
+  const { otp, email } = req.body;
+
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      name: true,
+      email: true,
+      emailVerificationOtp: true,
+      emailVerificationOtpExpiry: true,
+      isVerified: true,
+    },
+  });
+
+  if (!findUser) {
+    logger.warn(`OTP verification attempt with non-existent email: ${email}`);
+    throw new ApiError(404, 'User not found', {});
+  }
+
+  if (findUser.isVerified) {
+    logger.error(
+      `OTP verification attempt for already verified email: ${email}`
+    );
+    throw new ApiError(400, 'Email is already verified', {});
+  }
+
+  const isOtpExpired =
+    Date.now() > new Date(findUser.emailVerificationOtpExpiry).getTime(); // Using this because in Schema I am storing in DateTime
+
+  if (isOtpExpired) {
+    logger.warn(`OTP expired for email: ${email}`);
+    throw new ApiError(400, 'OTP has expired. Please request a new one.', {});
+  }
+
+  const isOtpValid = await compareHash(otp, findUser.emailVerificationOtp);
+
+  if (!isOtpValid) {
+    logger.warn(`Invalid OTP attempt for email: ${email}`);
+    throw new ApiError(400, 'Invalid OTP. Please check and try again.', {});
+  }
+
+  const updateUser = await prisma.user.update({
+    where: {
+      email: findUser.email,
+    },
+    data: {
+      emailVerificationOtp: null,
+      emailVerificationOtpExpiry: null,
+      isVerified: true,
+    },
+  });
+
+  //  Set access & refresh token only after signup & after user is verified
+  const { accessToken, refreshToken } = generateRefreshAccessToken(
+    updateUser.id,
+    updateUser.tokenVersion
+  );
+
+  const sanitizedUser = sanitizeUser(updateUser);
+
+  res
+    .status(200)
+    .cookie('refreshToken', refreshToken, cookieOptions.options)
+    .cookie('accessToken', accessToken, cookieOptions.options)
+    .json(new ApiResponse(200, 'User verification successful', sanitizedUser));
+});
+
+/**
+ * Send OTP for email verification
+ * @async
+ * @function sendOTP
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing email
+ * @param {string} req.body.email - User's email
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends OTP response
+ */
+export const sendOTP = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      name: true,
+      email: true,
+      emailVerificationOtp: true,
+      emailVerificationOtpExpiry: true,
+      isVerified: true,
+    },
+  });
+
+  if (!findUser) {
+    logger.warn(
+      `OTP send attempt for non-existent or verified email: ${email}`
+    );
+    throw new ApiError(404, 'User not found or already verified', {});
+  }
+
+  const { unhashedOtp, hashedOtp, otpExpiry } =
+    await generateEmailVerificationOTP();
 
   logger.info(
     `Otp in register controller: ${unhashedOtp} ${hashedOtp} ${otpExpiry}`
@@ -62,7 +264,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   const updateUser = await prisma.user.update({
     where: {
-      email: newUser.email,
+      email: findUser.email,
     },
     data: {
       emailVerificationOtp: hashedOtp,
@@ -71,87 +273,216 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (!updateUser) {
-    logger.error(`updateUser failed in register controller:`, {
-      user: updateUser,
-    });
-    throw new ApiError(
-      500,
-      'User email verification failed please try again later',
-      []
-    );
+    logger.error(`Failed to update user OTP in database for email: ${email}`);
+    throw new ApiError(500, 'Failed to send OTP. Please try again later.', {});
   }
 
   await sendEmail({
     email,
     subject: 'Email Verification',
-    mailgenContent: emailVerificationMailgenContent(newUser?.name, unhashedOtp),
+    mailgenContent: emailVerificationMailgenContent(
+      findUser?.name,
+      unhashedOtp
+    ),
   });
 
-  res.status(201).json(
-    new ApiResponse(201, 'User registered successfully', {
-      username: newUser.name,
-      email: newUser.email,
-      isVerified: newUser.isVerified,
-    })
-  );
+  const sanitizedUser = sanitizeUser(updateUser);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, 'OTP sent successfully', sanitizedUser));
 });
 
-export const loginUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+/**
+ * Logout user and invalidate tokens
+ * @async
+ * @function logoutUser
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user object
+ * @param {string} req.user.email - User's email
+ * @param {number} req.user.tokenVersion - User's token version
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends logout response
+ */
+export const logoutUser = asyncHandler(async (req, res) => {
+  const findUser = await prisma.user.update({
+    where: {
+      email: req.user?.email,
+    },
+    data: {
+      tokenVersion: req.user?.tokenVersion + 1,
+    },
+    select: {
+      name: true,
+      email: true,
+      isVerified: true,
+    },
+  });
 
-  logger.info(
-    `name email password in loginUser controller: ${name} ${email} ${password}`
-  );
+  if (!findUser) {
+    logger.warn(`Logout attempt for non-existent user: ${req.user?.email}`);
+    throw new ApiError(404, 'User not found', {});
+  }
+
+  if (!findUser.isVerified) {
+    logger.warn(`Logout attempt for unverified user: ${req.user?.email}`);
+    throw new ApiError(403, 'Cannot logout unverified user', {});
+  }
+
+  res
+    .clearCookie('accessToken', cookieOptions.options)
+    .clearCookie('refreshToken', cookieOptions.options)
+    .status(200)
+    .json(new ApiResponse(200, 'Logout successful', {}));
+});
+
+/**
+ * Reset user password using OTP
+ * @async
+ * @function resetPassword
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing reset data
+ * @param {string} req.body.email - User's email
+ * @param {string} req.body.otp - Reset password OTP
+ * @param {string} req.body.newPassword - New password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends reset password response
+ */
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { otp, email } = req.body;
 
   const findUser = await prisma.user.findUnique({
     where: {
       email,
     },
+    select: {
+      name: true,
+      email: true,
+      resetPasswordOtp: true,
+      resetPasswordOtpExpiry: true,
+    },
   });
 
   if (!findUser) {
-    logger.error(`findUser in login controller: ${findUser}`);
-    throw new ApiError(409, 'User login failed', []);
-  }
-
-  const passwordValid = await comparePassword(password, findUser.password)
-
-  if (!passwordValid) {
     logger.error(
-      `password - ${password} hashedPassword - ${hashedPassword} db pass - ${findUser.password}`
+      `OTP send attempt for non-existent or verified email: ${email}`
     );
-    throw new ApiError(400, 'User login failed', []);
+    throw new ApiError(404, 'User not found', {});
   }
 
-  const {accessToken,refreshToken,hashedRefreshToken} = generateRefreshAccessToken(findUser.id,findUser.email)
+  const isOtpExpired =
+    Date.now > new Date(findUser.resetPasswordOtpExpiry).getTime();
 
-  logger.info(`accessToken in login controller: ${accessToken}`);
-  logger.info(`refreshToken in login controller: ${refreshToken}`);
-  logger.info(`hashedRefreshToken in login controller: ${hashedRefreshToken}`);
+  if (isOtpExpired) {
+    logger.error(`OTP expired for email: ${email}`);
+    throw new ApiError(400, 'OTP has expired. Please request a new one.', {});
+  }
 
-  const user = await prisma.user.update({
-    where:{
-      email: findUser.email
+  const isOtpValid = await compareHash(otp, findUser.resetPasswordOtp);
+
+  if (!isOtpValid) {
+    logger.error(`Invalid OTP attempt for email: ${email}`);
+    throw new ApiError(400, 'Invalid OTP. Please check and try again.', {});
+  }
+
+  const updateUser = await prisma.user.update({
+    where: {
+      email: findUser.email,
     },
-    data:{
-      refreshToken: hashedRefreshToken,
-    }
-  })
+    data: {
+      resetPasswordOtp: null,
+      resetPasswordOtpExpiry: null,
+    },
+  });
+});
 
-  if(!user){
-    logger.error(`user in login controller:`,{user});
-    throw new ApiError(500, 'User login failed', []);
+/**
+ * Send forgot password OTP
+ * @async
+ * @function forgotPassword
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing email
+ * @param {string} req.body.email - User's email
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends forgot password OTP response
+ */
+export const forgotPassword = asyncHandler(async (req, res) => {});
+
+/**
+ * Change current user password
+ * @async
+ * @function changeCurrentPassword
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing password data
+ * @param {string} req.body.currentPassword - Current password
+ * @param {string} req.body.newPassword - New password
+ * @param {Object} req.user - Authenticated user object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends change password response
+ */
+export const changeCurrentPassword = asyncHandler(async (req, res) => {
+  // TODO: Implement change password logic
+});
+
+/**
+ * Refresh access token using refresh token
+ * @async
+ * @function refreshAccessToken
+ * @param {Object} req - Express request object
+ * @param {Object} req.cookies - Request cookies
+ * @param {string} req.cookies.refreshToken - Refresh token
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends new access token response
+ */
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  // const incomingRefreshToken = req.cookies?.refreshToken;
+
+  // if (!incomingRefreshToken) {
+  //   logger.error('Refresh token not found in cookies');
+  //   throw new ApiError(401, 'Refresh token not found', {});
+  // }
+
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email: req.user?.email,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      tokenVersion: true,
+      isVerified: true,
+    },
+  });
+
+  if (!findUser) {
+    logger.error(
+      `Refresh token attempt for non-existent user: ${req.user?.email}`
+    );
+    throw new ApiError(404, 'User not found', {});
   }
+
+  // if (!findUser.isVerified) {
+  //   logger.error(`Refresh token attempt for unverified user: ${req.user?.email}`);
+  //   throw new ApiError(403, 'User not verified', {});
+  // }
+
+  const { accessToken, refreshToken } = await generateRefreshAccessToken(
+    findUser.id,
+    findUser.tokenVersion
+  );
+
+  logger.info(`New tokens generated for user: ${findUser.email}`);
 
   res
-  .status(200)
-  .cookie('refreshToken',refreshToken,cookiesOption.options)
-  .cookie("accessToken",accessToken,cookiesOption.options)
-  .json(
-    new ApiResponse(200, 'User login successfull', {
-      username: findUser.username,
-      email: findUser.email,
-      isVerified: findUser.isVerified,
-    })
-  );
+    .status(200)
+    .cookie('refreshToken', refreshToken, cookieOptions.options)
+    .cookie('accessToken', accessToken, cookieOptions.options)
+    .json(
+      new ApiResponse(200, 'Access & refresh token updated successfully', {
+        name: findUser.name,
+        email: findUser.email,
+        isVerified: findUser.isVerified,
+      })
+    );
 });

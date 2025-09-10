@@ -12,7 +12,7 @@ model User {
   name                       String
   email                      String    @unique
   password                   String
-  refreshToken               String?
+  tokenVersion               Int       @default(1)
   isVerified                 Boolean   @default(false)
   emailVerificationOtp       String?
   emailVerificationOtpExpiry DateTime?

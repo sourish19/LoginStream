@@ -1,12 +1,3 @@
-/**
- * Custom error handling middleware
- * @function customErrorResponse
- * @param {Error} err - Error object
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- * @returns {void} Sends error response
- */
 const customErrorResponse = (err, req, res, next) => {
   if (err.statusCode) {
     // This is ApiError
