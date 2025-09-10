@@ -86,3 +86,13 @@ export const generateRefreshAccessToken = async (userId, tokenVersion) => {
   );
   return { accessToken, refreshToken };
 };
+
+export const decodeJwtToken = (token, secret) => {
+  try {
+    const decoded = jwt.verify(token, secret);
+    return decoded;
+  } catch (error) {
+    logger.warn(error.message);
+    return null;
+  }
+};

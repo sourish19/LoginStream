@@ -7,13 +7,14 @@ import {
   generateHashedPassword,
   compareHash,
   generateRefreshAccessToken,
+  decodeJwtToken,
 } from '../utils/helper.util.js';
 import logger from '../logger/winston.logger.js';
 import {
   sendEmail,
   emailVerificationMailgenContent,
 } from '../utils/mail.util.js';
-import { cookieOptions } from '../utils/constants.util.js';
+import { cookieOptions, JWT_CONSTANTS } from '../utils/constants.util.js';
 import sanitizeUser from '../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
@@ -222,6 +223,39 @@ export const verifyOTP = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, 'User verification successful', sanitizedUser));
 });
 
+const handleOTP = async (user) => {
+  const { unhashedOtp, hashedOtp, otpExpiry } =
+    await generateEmailVerificationOTP();
+
+  logger.info(
+    `Otp in register controller: ${unhashedOtp} ${hashedOtp} ${otpExpiry}`
+  );
+
+  const updateUser = await prisma.user.update({
+    where: {
+      email: user?.email,
+    },
+    data: {
+      emailVerificationOtp: hashedOtp,
+      emailVerificationOtpExpiry: otpExpiry,
+    },
+  });
+
+  if (!updateUser) {
+    logger.error(`Failed to update user OTP in database for email: ${email}`);
+    throw new ApiError(500, 'Failed to send OTP. Please try again later.', {});
+  }
+
+  await sendEmail({
+    email,
+    subject: 'Email Verification',
+    mailgenContent: emailVerificationMailgenContent(
+      updateUser?.name,
+      unhashedOtp
+    ),
+  });
+};
+
 /**
  * Send OTP for email verification
  * @async
@@ -255,42 +289,48 @@ export const sendOTP = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'User not found or already verified', {});
   }
 
-  const { unhashedOtp, hashedOtp, otpExpiry } =
-    await generateEmailVerificationOTP();
-
-  logger.info(
-    `Otp in register controller: ${unhashedOtp} ${hashedOtp} ${otpExpiry}`
-  );
-
-  const updateUser = await prisma.user.update({
-    where: {
-      email: findUser.email,
-    },
-    data: {
-      emailVerificationOtp: hashedOtp,
-      emailVerificationOtpExpiry: otpExpiry,
-    },
-  });
-
-  if (!updateUser) {
-    logger.error(`Failed to update user OTP in database for email: ${email}`);
-    throw new ApiError(500, 'Failed to send OTP. Please try again later.', {});
+  if (findUser.isVerified) {
+    logger.warn(`OTP send attempt for already verified email: ${email}`);
+    throw new ApiError(400, 'Email is already verified', {});
   }
 
-  await sendEmail({
-    email,
-    subject: 'Email Verification',
-    mailgenContent: emailVerificationMailgenContent(
-      findUser?.name,
-      unhashedOtp
-    ),
+  await handleOTP(findUser);
+
+  res.status(200).json(new ApiResponse(200, 'OTP sent successfully', {}));
+});
+
+export const resendOTP = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      name: true,
+      email: true,
+      emailVerificationOtp: true,
+      emailVerificationOtpExpiry: true,
+      isVerified: true,
+      updatedAt: true,
+    },
   });
 
-  const sanitizedUser = sanitizeUser(updateUser);
+  if (!findUser) {
+    logger.warn(
+      `OTP send attempt for non-existent or verified email: ${email}`
+    );
+    throw new ApiError(404, 'User not found or already verified', {});
+  }
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, 'OTP sent successfully', sanitizedUser));
+  if (findUser.isVerified) {
+    logger.warn(`OTP send attempt for already verified email: ${email}`);
+    throw new ApiError(400, 'Email is already verified', {});
+  }
+
+  await handleOTP(findUser);
+
+  res.status(200).json(new ApiResponse(200, 'OTP sent successfully', {}));
 });
 
 /**
@@ -435,16 +475,24 @@ export const changeCurrentPassword = asyncHandler(async (req, res) => {
  * @returns {Promise<void>} Sends new access token response
  */
 export const refreshAccessToken = asyncHandler(async (req, res) => {
-  // const incomingRefreshToken = req.cookies?.refreshToken;
+  if (!req.cookies?.refreshToken) {
+    logger.warn('Refresh token not found in cookies');
+    throw new ApiError(401, 'Unauthorized request', {});
+  }
 
-  // if (!incomingRefreshToken) {
-  //   logger.error('Refresh token not found in cookies');
-  //   throw new ApiError(401, 'Refresh token not found', {});
-  // }
+  const decodedToken = decodeJwtToken(
+    req.cookies?.refreshToken,
+    JWT_CONSTANTS.refreshTokenSecret
+  );
+
+  if (!decodedToken) {
+    logger.warn(`Invalid refresh token ${decodedToken}`);
+    throw new ApiError(401, 'Unauthorized request', {});
+  }
 
   const findUser = await prisma.user.findUnique({
     where: {
-      email: req.user?.email,
+      id: decodedToken.userId,
     },
     select: {
       id: true,
@@ -457,20 +505,24 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
   if (!findUser) {
     logger.error(
-      `Refresh token attempt for non-existent user: ${req.user?.email}`
+      `Refresh token attempt for non-existent user: ${decodedToken?.userId}`
     );
     throw new ApiError(404, 'User not found', {});
   }
 
-  // if (!findUser.isVerified) {
-  //   logger.error(`Refresh token attempt for unverified user: ${req.user?.email}`);
-  //   throw new ApiError(403, 'User not verified', {});
-  // }
+  if (findUser.tokenVersion !== decodedToken.tokenVersion) {
+    logger.error(
+      `Refresh token attempt for non-existent user: ${findUser.email}`
+    );
+    throw new ApiError(401, 'Unauthorized request', {});
+  }
 
   const { accessToken, refreshToken } = await generateRefreshAccessToken(
     findUser.id,
     findUser.tokenVersion
   );
+
+  const sanitizedUser = sanitizeUser(findUser);
 
   logger.info(`New tokens generated for user: ${findUser.email}`);
 
@@ -479,10 +531,10 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     .cookie('refreshToken', refreshToken, cookieOptions.options)
     .cookie('accessToken', accessToken, cookieOptions.options)
     .json(
-      new ApiResponse(200, 'Access & refresh token updated successfully', {
-        name: findUser.name,
-        email: findUser.email,
-        isVerified: findUser.isVerified,
-      })
+      new ApiResponse(
+        200,
+        'Access & refresh token updated successfully',
+        sanitizedUser
+      )
     );
 });
