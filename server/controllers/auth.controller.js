@@ -19,6 +19,36 @@ import sanitizeUser from '../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
+const handleOTP = async (user) => {
+  const { unhashedOtp, hashedOtp, otpExpiry } =
+    await generateEmailVerificationOTP();
+
+  console.log(unhashedOtp, hashedOtp, otpExpiry);
+
+  const updateUser = await prisma.user.update({
+    where: {
+      email: user?.email,
+    },
+    data: {
+      emailVerificationOtp: hashedOtp,
+      emailVerificationOtpExpiry: otpExpiry,
+    },
+  });
+
+  if (!updateUser) {
+    logger.error(`Failed to update user OTP in database for email: ${email}`);
+    throw new ApiError(500, 'Failed to send OTP. Please try again later.', {});
+  }
+
+  await sendEmail({
+    email: user?.email,
+    subject: 'Email Verification',
+    mailgenContent: emailVerificationMailgenContent(
+      updateUser?.name,
+      unhashedOtp
+    ),
+  });
+};
 /**
  * Register a new user
  * @async
@@ -143,6 +173,10 @@ export const loginUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, 'User login successful', sanitizedUser));
 });
 
+export const getMe = asyncHandler(async (req, res) => {
+  // TODO: Implement get me
+});
+
 /**
  * Verify email OTP for user registration
  * @async
@@ -223,39 +257,6 @@ export const verifyOTP = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, 'User verification successful', sanitizedUser));
 });
 
-const handleOTP = async (user) => {
-  const { unhashedOtp, hashedOtp, otpExpiry } =
-    await generateEmailVerificationOTP();
-
-  logger.info(
-    `Otp in register controller: ${unhashedOtp} ${hashedOtp} ${otpExpiry}`
-  );
-
-  const updateUser = await prisma.user.update({
-    where: {
-      email: user?.email,
-    },
-    data: {
-      emailVerificationOtp: hashedOtp,
-      emailVerificationOtpExpiry: otpExpiry,
-    },
-  });
-
-  if (!updateUser) {
-    logger.error(`Failed to update user OTP in database for email: ${email}`);
-    throw new ApiError(500, 'Failed to send OTP. Please try again later.', {});
-  }
-
-  await sendEmail({
-    email,
-    subject: 'Email Verification',
-    mailgenContent: emailVerificationMailgenContent(
-      updateUser?.name,
-      unhashedOtp
-    ),
-  });
-};
-
 /**
  * Send OTP for email verification
  * @async
@@ -293,7 +294,6 @@ export const sendOTP = asyncHandler(async (req, res) => {
     logger.warn(`OTP send attempt for already verified email: ${email}`);
     throw new ApiError(400, 'Email is already verified', {});
   }
-
   await handleOTP(findUser);
 
   res.status(200).json(new ApiResponse(200, 'OTP sent successfully', {}));
@@ -446,7 +446,9 @@ export const resetPassword = asyncHandler(async (req, res) => {
  * @param {Object} res - Express response object
  * @returns {Promise<void>} Sends forgot password OTP response
  */
-export const forgotPassword = asyncHandler(async (req, res) => {});
+export const forgotPassword = asyncHandler(async (req, res) => {
+  // TODO: Implement forgot password logic
+});
 
 /**
  * Change current user password

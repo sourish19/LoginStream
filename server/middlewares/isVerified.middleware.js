@@ -1,6 +1,6 @@
-import logger from '../logger/winston.logger';
-import asyncHandler from '../utils/asyncHandler.util';
-import ApiError from '../utils/apiError.util';
+import logger from '../logger/winston.logger.js';
+import asyncHandler from '../utils/asyncHandler.util.js';
+import ApiError from '../utils/apiError.util.js';
 
 const isVerified = asyncHandler(async (req, res, next) => {
   const user = req.user;

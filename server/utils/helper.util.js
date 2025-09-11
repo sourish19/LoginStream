@@ -32,7 +32,7 @@ export const generateEmailVerificationOTP = async () => {
     specialChars: false,
   });
   const hashedOtp = await bcrypt.hash(unhashedOtp, 10);
-  const otpExpiry = Date.now() + 1000 * 60 * 5; // 5min
+  const otpExpiry = new Date(Date.now() + 1000 * 60 * 5); // 5min
   return { unhashedOtp, hashedOtp, otpExpiry };
 };
 

@@ -14,7 +14,7 @@ app.use(urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/api/v1/health-check', healthCheck);
-app.use('/api/v1/user', router);
+app.use('/api/v1/auth', router);
 
 app.use(customErrorResponse);
 

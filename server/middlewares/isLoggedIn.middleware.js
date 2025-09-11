@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import logger from '../logger/winston.logger';
-import asyncHandler from '../utils/asyncHandler.util';
-import { JWT_CONSTANTS } from '../utils/constants.util';
-import ApiError from '../utils/apiError.util';
-import { decodeJwtToken } from '../utils/helper.util';
+import logger from '../logger/winston.logger.js';
+import asyncHandler from '../utils/asyncHandler.util.js';
+import { JWT_CONSTANTS } from '../utils/constants.util.js';
+import ApiError from '../utils/apiError.util.js';
+import { decodeJwtToken } from '../utils/helper.util.js';
 
 const prisma = new PrismaClient();
 

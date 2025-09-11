@@ -11,7 +11,7 @@ const colors = {
   error: 'red',
   warn: 'yellow',
   info: 'green',
-  http: 'blue',
+  debug: 'blue',
 };
 
 addColors(colors);
