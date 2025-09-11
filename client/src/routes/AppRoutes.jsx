@@ -11,7 +11,7 @@ import Signin from '@/pages/Signin'
 import Signup from '@/pages/Signup'
 import ForgotPassword from '@/pages/ForgotPassword'
 import ResetPassword from '@/pages/ResetPassword'
-import VerifyEmail from '@/pages/VerifyEmail'
+// import VerifyEmail from '@/pages/VerifyEmail'
 
 const AppRoutes = () => {
   return (
@@ -36,7 +36,7 @@ const AppRoutes = () => {
       />
       <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='reset-password' element={<ResetPassword />} />
-      <Route path='/verify-email' element={<VerifyEmail />} />
+      {/* <Route path='/verify-email' element={<VerifyEmail />} /> */}
       <Route
         path='/'
         element={

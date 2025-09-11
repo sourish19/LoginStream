@@ -25,6 +25,7 @@ const initialState = {
   resendOtp: { ...requestState },
   forgotPassword: { ...requestState },
   resetPassword: { ...requestState },
+  changePassword: { ...requestState }, // TODO: add this in async thunk & other reducer
   logout: { ...requestState },
   loggedInUser: null,
   isAuthChecked: false
@@ -157,7 +158,7 @@ const authSlice = createSlice({
   // Used to handle async actions & to update the state
   extraReducers: (builder) => {
     builder
-    // Signup
+      // Signup
       .addCase(signupAsync.pending, (state) => {
         state.signup.status = 'pending'
       })
@@ -178,7 +179,7 @@ const authSlice = createSlice({
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.login.status = 'fulfilled'
         state.login.successMessage = action.payload?.message
-        state.loggedInUser = action.payload?.user 
+        state.loggedInUser = action.payload?.user
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.login.status = 'rejected'
@@ -205,7 +206,7 @@ const authSlice = createSlice({
       })
       .addCase(resendOtpAsync.fulfilled, (state, action) => {
         state.resendOtp.status = 'fulfilled'
-        state.resendOtp.successMessage = action.payload?.message || 'OTP resent successfully' 
+        state.resendOtp.successMessage = action.payload?.message || 'OTP resent successfully'
       })
       .addCase(resendOtpAsync.rejected, (state, action) => {
         state.resendOtp.status = 'rejected'
