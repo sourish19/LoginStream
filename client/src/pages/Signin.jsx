@@ -1,14 +1,48 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { loginSchema } from '@/config/schemaValidation'
+import { clearLoginError, clearLoginSuccessMessage, loggedInUserSelect, loginAsync, loginSelect, resetLoginStatus } from '@/app/authSlice'
+import { Spinner } from '@/components/ui/spinner'
 
 const Signin = () => {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const login = useSelector(loginSelect)
+  const loggedInUser = useSelector(loggedInUserSelect)
+
+  // Check if user is logged in or verified
+  useEffect(()=>{
+    if(loggedInUser && loggedInUser.isVerified){
+      navigate('/')
+    }
+    else if(loggedInUser && !loggedInUser.isVerified){
+      navigate('/send-otp')
+    }
+  },[loggedInUser])
+
+  // Check login status & cleanup after first render
+  useEffect(()=>{
+    if(login.status === 'fulfilled'){
+      toast.success(login.successMessage)
+    }
+    else if(login.status === 'rejected'){
+      toast.error(login.error)
+    }
+    return ()=>{
+      dispatch(resetLoginStatus())
+      dispatch(clearLoginSuccessMessage())
+      dispatch(clearLoginError())
+    }
+  },[login])
+
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -19,6 +53,7 @@ const Signin = () => {
 
   const onSubmit = (data) => {
     console.log(data)
+    dispatch(loginAsync(data))
   }
 
   return (
@@ -51,7 +86,7 @@ const Signin = () => {
                   <FormItem>
                     <div className='flex items-center justify-between'>
                       <FormLabel>Password</FormLabel>
-                      <Link className='text-sm underline-offset-4 hover:underline'>
+                      <Link to='/forgot-password' className='text-sm underline-offset-4 hover:underline'>
                         Forgot your password?
                       </Link>
                     </div>
@@ -62,10 +97,13 @@ const Signin = () => {
                   </FormItem>
                 )}
               />
-
-              <Button type='submit' className='w-full cursor-pointer'>
-                Submit
-              </Button>
+              {login?.status === 'pending' ? (
+                <Spinner size='small' />
+              ) : (
+                <Button type='submit' className='w-full cursor-pointer'>
+                  Signin
+                </Button>
+              )}
             </form>
           </Form>
         </CardContent>
@@ -76,7 +114,7 @@ const Signin = () => {
           <CardDescription>
             Don't have an account?{' '}
             <Button className={'cursor-pointer'} variant='link'>
-              Signup
+              <Link to={'/signup'}>Sign up</Link>
             </Button>
           </CardDescription>
         </CardFooter>

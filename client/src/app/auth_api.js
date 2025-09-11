@@ -1,20 +1,21 @@
 import axiosInstance from '@/config/axios'
+import parseError from '@/config/parseError'
 
 const signupApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/user/signup', data)
+    const res = await axiosInstance.post('/api/v1/auth/register', data)
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
 const loginApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/user/login', data)
+    const res = await axiosInstance.post('/api/v1/auth/login', data)
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
@@ -23,7 +24,7 @@ const verifyOtpApi = async (data) => {
     const res = await axiosInstance.post('/api/v1/user/verify-otp', data)
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
@@ -32,7 +33,7 @@ const resendOtpApi = async (data) => {
     const res = await axiosInstance.post('/api/v1/user/resend-otp', data)
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
@@ -41,7 +42,7 @@ const forgotPasswordApi = async (data) => {
     const res = await axiosInstance.post('/api/v1/user/forgot-password', data)
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
@@ -50,7 +51,7 @@ const resetPasswordApi = async (data) => {
     const res = await axiosInstance.post('/api/v1/user/reset-password', data)
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
@@ -59,7 +60,7 @@ const checkAuthApi = async () => {
     const res = await axiosInstance.get('/api/v1/user/getme')
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
@@ -68,7 +69,7 @@ const refreshAccessTokenApi = async () => {
     const res = await axiosInstance.get('/api/v1/user/refresh-token')
     return res.data
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 
@@ -76,7 +77,7 @@ const logoutApi = async () => {
   try {
     const res = await axiosInstance.get('/api/v1/user/logout')
   } catch (error) {
-    throw error.message
+    throw parseError(error)
   }
 }
 

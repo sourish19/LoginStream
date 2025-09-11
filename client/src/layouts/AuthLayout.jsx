@@ -3,9 +3,9 @@ import Navbar from '../components/Navbar'
 
 const AuthLayout = ({ children }) => {
   return (
-    <div className='relative flex h-screen w-full flex-col bg-[#0f0f0f] py-10 text-white'>
+    <div className='relative flex min-h-screen w-full flex-col bg-[#0f0f0f] py-10 text-white'>
       <div
-        className='absolute inset-0 z-0 flex'
+        className='absolute inset-0 z-0 flex min-h-screen w-full'
         style={{
           backgroundImage: `
         linear-gradient(to right, #262626 1px, transparent 1px),

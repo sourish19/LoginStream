@@ -91,7 +91,7 @@ const authSlice = createSlice({
     clearAuthError: (state) => {
       state.global.error = null
     },
-    clearSignupStatus: (state) => {
+    resetSignupStatus: (state) => {
       state.signup.status = 'idle'
     },
     clearSignupSuccessMessage: (state) => {
@@ -165,7 +165,7 @@ const authSlice = createSlice({
       .addCase(signupAsync.fulfilled, (state, action) => {
         state.signup.status = 'fulfilled'
         state.signup.successMessage = action.payload?.message
-        state.loggedInUser = action.payload?.user
+        state.loggedInUser = action.payload?.data
       })
       .addCase(signupAsync.rejected, (state, action) => {
         state.signup.status = 'rejected'
@@ -310,6 +310,18 @@ export const {
   clearSignupSuccessMessage,
   clearSignupError
 } = authSlice.actions
+
+export const loggedInUserSelect = (state) => state.auth.loggedInUser
+export const globalSelect = (state) => state.auth.global
+export const isAuthCheckedSelect = (state) => state.auth.isAuthChecked
+export const signupSelect = (state) => state.auth.signup
+export const loginSelect = (state) => state.auth.login
+export const otpVerificationSelect = (state) => state.auth.otpVerification
+export const forgotPasswordSelect = (state) => state.auth.forgotPassword
+export const resetPasswordSelect = (state) => state.auth.resetPassword
+export const changePasswordSelect = (state) => state.auth.changePassword // TODO
+export const logoutSelect = (state) => state.auth.logout
+export const resendOtpSelect = (state) => state.auth.resendOtp // FIX THIS
 
 //  Export the Reducers
 export default authSlice.reducer

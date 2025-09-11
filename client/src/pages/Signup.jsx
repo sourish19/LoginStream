@@ -1,13 +1,48 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'sonner'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { signupSchema } from '@/config/schemaValidation'
+import { signupAsync, signupSelect } from '@/app/authSlice'
+import { loggedInUserSelect } from '@/app/authSlice'
+import { Spinner } from '@/components/ui/spinner'
+import { resetSignupStatus, clearSignupError, clearSignupSuccessMessage } from '@/app/authSlice'
 
 const Signup = () => {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const loggedInUser = useSelector(loggedInUserSelect)
+  const signup = useSelector(signupSelect)
+
+  // Check if user is logged in
+  useEffect(() => {
+    if (loggedInUser && loggedInUser.isVerified) {
+      navigate('/')
+    } else if (loggedInUser && !loggedInUser.isVerified) {
+      navigate('/send-otp')
+    }
+  }, [loggedInUser])
+
+  // Check signup status & cleanup after first render
+  useEffect(() => {
+    if (signup.status === 'fulfilled') {
+      toast.success(signup.successMessage)
+    } else if (signup.status === 'rejected') {
+      toast.error(signup.error)
+    }
+    return () => {
+      dispatch(resetSignupStatus())
+      dispatch(clearSignupError())
+      dispatch(clearSignupSuccessMessage())
+    }
+  }, [signup])
+
   const form = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -18,7 +53,7 @@ const Signup = () => {
   })
 
   const onSubmit = (data) => {
-    console.log(data)
+    dispatch(signupAsync(data))
   }
 
   return (
@@ -70,9 +105,13 @@ const Signup = () => {
                   </FormItem>
                 )}
               />
-              <Button type='submit' className='w-full cursor-pointer'>
-                Submit
-              </Button>
+              {signup?.status === 'pending' ? (
+                <Spinner size='small' />
+              ) : (
+                <Button type={'submit'} className={'w-full'}>
+                  Signup
+                </Button>
+              )}
             </form>
           </Form>
         </CardContent>
@@ -83,7 +122,7 @@ const Signup = () => {
           <CardDescription>
             Already have an account?{' '}
             <Button className={'cursor-pointer'} variant='link'>
-              Signin
+              <Link to={'/signin'}>Signin</Link>
             </Button>
           </CardDescription>
         </CardFooter>
