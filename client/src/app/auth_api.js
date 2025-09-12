@@ -21,7 +21,7 @@ const loginApi = async (data) => {
 
 const verifyOtpApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/user/verify-otp', data)
+    const res = await axiosInstance.post('/api/v1/auth/verify-otp', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -30,7 +30,7 @@ const verifyOtpApi = async (data) => {
 
 const sendOtpApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/user/resend-otp', data)
+    const res = await axiosInstance.patch('/api/v1/auth/send-otp', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -39,7 +39,7 @@ const sendOtpApi = async (data) => {
 
 const forgotPasswordApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/user/forgot-password', data)
+    const res = await axiosInstance.post('/api/v1/auth/forgot-password', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -57,7 +57,7 @@ const resetPasswordApi = async (data) => {
 
 const checkAuthApi = async () => {
   try {
-    const res = await axiosInstance.get('/api/v1/user/getme')
+    const res = await axiosInstance.get('/api/v1/auth/getme')
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -66,7 +66,7 @@ const checkAuthApi = async () => {
 
 const refreshAccessTokenApi = async () => {
   try {
-    const res = await axiosInstance.get('/api/v1/user/refresh-token')
+    const res = await axiosInstance.get('/api/v1/auth/refresh-token')
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -75,7 +75,7 @@ const refreshAccessTokenApi = async () => {
 
 const logoutApi = async () => {
   try {
-    const res = await axiosInstance.get('/api/v1/user/logout')
+    const res = await axiosInstance.get('/api/v1/auth/logout')
   } catch (error) {
     throw parseError(error)
   }

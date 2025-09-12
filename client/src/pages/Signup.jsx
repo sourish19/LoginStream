@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { signupSchema } from '@/config/schemaValidation'
 import { signupAsync, signupSelect } from '@/app/authSlice'
@@ -33,6 +33,7 @@ const Signup = () => {
   useEffect(() => {
     if (signup.status === 'fulfilled') {
       toast.success(signup.successMessage)
+      navigate('/send-otp')
     } else if (signup.status === 'rejected') {
       toast.error(signup.error)
     }
@@ -62,6 +63,11 @@ const Signup = () => {
         <CardHeader>
           <CardTitle>Create your account</CardTitle>
           <CardDescription>Enter your credentials to create your account</CardDescription>
+          <CardAction>
+            <Button variant={'link'}>
+              <Link to={'/send-otp'}>Send OTP</Link>
+            </Button>
+          </CardAction>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -122,7 +128,7 @@ const Signup = () => {
           <CardDescription>
             Already have an account?{' '}
             <Button className={'cursor-pointer'} variant='link'>
-              <Link to={'/signin'}>Signin</Link>
+              <Link to={'/signin'}>Sign in</Link>
             </Button>
           </CardDescription>
         </CardFooter>

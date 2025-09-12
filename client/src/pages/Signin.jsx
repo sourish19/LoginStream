@@ -69,6 +69,9 @@ const Signin = () => {
         <CardHeader>
           <CardTitle>Signin to your account</CardTitle>
           <CardDescription>Enter your credentials to signin to your account</CardDescription>
+          <Button variant={'link'}>
+            <Link to={'/send-otp'}>Send OTP</Link>
+          </Button>
         </CardHeader>
         <CardContent>
           <Form {...form}>
