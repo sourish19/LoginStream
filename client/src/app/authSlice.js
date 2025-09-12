@@ -3,7 +3,7 @@ import {
   signupApi,
   loginApi,
   verifyOtpApi,
-  resendOtpApi,
+  sendOtpApi,
   forgotPasswordApi,
   resetPasswordApi,
   checkAuthApi,
@@ -22,7 +22,7 @@ const initialState = {
   signup: { ...requestState },
   login: { ...requestState },
   otpVerification: { ...requestState },
-  resendOtp: { ...requestState },
+  sendOtp: { ...requestState },
   forgotPassword: { ...requestState },
   resetPassword: { ...requestState },
   changePassword: { ...requestState }, // TODO: add this in async thunk & other reducer
@@ -47,8 +47,8 @@ export const verifyOtpAsync = createAsyncThunk('auth/verifyOtpAsync', async (dat
   return res
 })
 
-export const resendOtpAsync = createAsyncThunk('auth/resendOtpAsync', async (data) => {
-  const res = await resendOtpApi(data)
+export const sendOtpAsync = createAsyncThunk('auth/sendOtpAsync', async (data) => {
+  const res = await sendOtpApi(data)
   return res
 })
 
@@ -82,6 +82,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    // Global reducers
     resetAuthStatus: (state) => {
       state.global.status = 'idle'
     },
@@ -91,6 +92,7 @@ const authSlice = createSlice({
     clearAuthError: (state) => {
       state.global.error = null
     },
+    // Signup reducers
     resetSignupStatus: (state) => {
       state.signup.status = 'idle'
     },
@@ -100,6 +102,7 @@ const authSlice = createSlice({
     clearSignupError: (state) => {
       state.signup.error = null
     },
+    // Login reducers
     resetLoginStatus: (state) => {
       state.login.status = 'idle'
     },
@@ -109,6 +112,7 @@ const authSlice = createSlice({
     clearLoginError: (state) => {
       state.login.error = null
     },
+    // OtpVerification reducers
     resetOtpVerificationStatus: (state) => {
       state.otpVerification.status = 'idle'
     },
@@ -118,6 +122,7 @@ const authSlice = createSlice({
     clearOtpVerificationError: (state) => {
       state.otpVerification.error = null
     },
+    // ResetPassword reducers
     resetResetPasswordStatus: (state) => {
       state.resetPassword.status = 'idle'
     },
@@ -127,6 +132,17 @@ const authSlice = createSlice({
     clearResetPasswordError: (state) => {
       state.resetPassword.error = null
     },
+    // ChangePassword reducers
+    resetChangePasswordStatus: (state) => {
+      state.changePassword.status = 'idle'
+    },
+    clearChangePasswordSuccessMessage: (state) => {
+      state.changePassword.successMessage = null
+    },
+    clearChangePasswordError: (state) => {
+      state.changePassword.error = null
+    },
+    // Logout reducers
     resetLogoutStatus: (state) => {
       state.logout.status = 'idle'
     },
@@ -136,15 +152,17 @@ const authSlice = createSlice({
     clearLogoutError: (state) => {
       state.logout.error = null
     },
-    resetResendOtpStatus: (state) => {
-      state.resendOtp.status = 'idle'
+    // SendOtp reducers
+    resetSendOtpStatus: (state) => {
+      state.sendOtp.status = 'idle'
     },
-    clearResendOtpSuccessMessage: (state) => {
-      state.resendOtp.successMessage = null
+    clearSendOtpSuccessMessage: (state) => {
+      state.sendOtp.successMessage = null
     },
-    clearResendOtpError: (state) => {
-      state.resendOtp.error = null
+    clearSendOtpError: (state) => {
+      state.sendOtp.error = null
     },
+    // ForgotPassword reducers
     resetForgotPasswordStatus: (state) => {
       state.forgotPassword.status = 'idle'
     },
@@ -200,17 +218,17 @@ const authSlice = createSlice({
         state.otpVerification.error = action.error?.message || 'OTP verification failed'
       })
 
-      // Resend OTP
-      .addCase(resendOtpAsync.pending, (state) => {
-        state.resendOtp.status = 'pending'
+      // send OTP
+      .addCase(sendOtpAsync.pending, (state) => {
+        state.sendOtp.status = 'pending'
       })
-      .addCase(resendOtpAsync.fulfilled, (state, action) => {
-        state.resendOtp.status = 'fulfilled'
-        state.resendOtp.successMessage = action.payload?.message || 'OTP resent successfully'
+      .addCase(sendOtpAsync.fulfilled, (state, action) => {
+        state.sendOtp.status = 'fulfilled'
+        state.sendOtp.successMessage = action.payload?.message || 'OTP resent successfully'
       })
-      .addCase(resendOtpAsync.rejected, (state, action) => {
-        state.resendOtp.status = 'rejected'
-        state.resendOtp.error = action.error?.message || 'Resend OTP failed'
+      .addCase(sendOtpAsync.rejected, (state, action) => {
+        state.sendOtp.status = 'rejected'
+        state.sendOtp.error = action.error?.message || 'Resend OTP failed'
       })
 
       // Forgot Password
@@ -246,7 +264,7 @@ const authSlice = createSlice({
       .addCase(logoutAsync.fulfilled, (state, action) => {
         state.logout.status = 'fulfilled'
         state.logout.successMessage = action.payload?.message || 'Logged out successfully'
-        state.loggedInUser = null // ✅ clear user
+        state.loggedInUser = null
       })
       .addCase(logoutAsync.rejected, (state, action) => {
         state.logout.status = 'rejected'
@@ -300,9 +318,9 @@ export const {
   resetLogoutStatus,
   clearLogoutSuccessMessage,
   clearLogoutError,
-  resetResendOtpStatus,
-  clearResendOtpSuccessMessage,
-  clearResendOtpError,
+  resetSendOtpStatus,
+  clearSendOtpSuccessMessage,
+  clearSendOtpError,
   resetForgotPasswordStatus,
   clearForgotPasswordSuccessMessage,
   clearForgotPasswordError,
@@ -321,7 +339,7 @@ export const forgotPasswordSelect = (state) => state.auth.forgotPassword
 export const resetPasswordSelect = (state) => state.auth.resetPassword
 export const changePasswordSelect = (state) => state.auth.changePassword // TODO
 export const logoutSelect = (state) => state.auth.logout
-export const resendOtpSelect = (state) => state.auth.resendOtp // FIX THIS
+export const sendOtpSelect = (state) => state.auth.sendOtp // FIX THIS
 
 //  Export the Reducers
 export default authSlice.reducer

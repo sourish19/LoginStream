@@ -28,7 +28,7 @@ const verifyOtpApi = async (data) => {
   }
 }
 
-const resendOtpApi = async (data) => {
+const sendOtpApi = async (data) => {
   try {
     const res = await axiosInstance.post('/api/v1/user/resend-otp', data)
     return res.data
@@ -85,7 +85,7 @@ export {
   signupApi,
   loginApi,
   verifyOtpApi,
-  resendOtpApi,
+  sendOtpApi,
   forgotPasswordApi,
   resetPasswordApi,
   checkAuthApi,

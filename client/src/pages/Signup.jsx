@@ -20,7 +20,7 @@ const Signup = () => {
   const loggedInUser = useSelector(loggedInUserSelect)
   const signup = useSelector(signupSelect)
 
-  // Check if user is logged in
+  // Check if user is logged in or verified
   useEffect(() => {
     if (loggedInUser && loggedInUser.isVerified) {
       navigate('/')

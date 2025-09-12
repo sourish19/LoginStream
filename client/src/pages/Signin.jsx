@@ -3,14 +3,23 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
+
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { loginSchema } from '@/config/schemaValidation'
-import { clearLoginError, clearLoginSuccessMessage, loggedInUserSelect, loginAsync, loginSelect, resetLoginStatus } from '@/app/authSlice'
 import { Spinner } from '@/components/ui/spinner'
+
+import { loginSchema } from '@/config/schemaValidation'
+import {
+  clearLoginError,
+  clearLoginSuccessMessage,
+  loggedInUserSelect,
+  loginAsync,
+  loginSelect,
+  resetLoginStatus
+} from '@/app/authSlice'
 
 const Signin = () => {
   const navigate = useNavigate()
@@ -19,29 +28,27 @@ const Signin = () => {
   const loggedInUser = useSelector(loggedInUserSelect)
 
   // Check if user is logged in or verified
-  useEffect(()=>{
-    if(loggedInUser && loggedInUser.isVerified){
+  useEffect(() => {
+    if (loggedInUser && loggedInUser.isVerified) {
       navigate('/')
-    }
-    else if(loggedInUser && !loggedInUser.isVerified){
+    } else if (loggedInUser && !loggedInUser.isVerified) {
       navigate('/send-otp')
     }
-  },[loggedInUser])
+  }, [loggedInUser])
 
   // Check login status & cleanup after first render
-  useEffect(()=>{
-    if(login.status === 'fulfilled'){
+  useEffect(() => {
+    if (login.status === 'fulfilled') {
       toast.success(login.successMessage)
-    }
-    else if(login.status === 'rejected'){
+    } else if (login.status === 'rejected') {
       toast.error(login.error)
     }
-    return ()=>{
+    return () => {
       dispatch(resetLoginStatus())
       dispatch(clearLoginSuccessMessage())
       dispatch(clearLoginError())
     }
-  },[login])
+  }, [login])
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
