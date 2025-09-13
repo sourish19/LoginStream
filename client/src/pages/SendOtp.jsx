@@ -36,6 +36,9 @@ const SendOtp = () => {
 
   // Check sendOtp status & cleanup after first render
   useEffect(() => {
+    if (sendOtp.status === 'pending') {
+      console.log('pending....')
+    }
     if (sendOtp.status === 'fulfilled') {
       toast.success(sendOtp.successMessage)
       navigate('/verify-otp')
@@ -51,74 +54,54 @@ const SendOtp = () => {
 
   // Send OTP api call
   const onSubmit = (data) => {
-      dispatch(sendOtpAsync(data))
+    dispatch(sendOtpAsync(data))
   }
 
   return (
     <div className='relative z-10 flex h-screen items-center justify-center'>
-        <div className='w-full max-w-md rounded-lg bg-neutral-100 p-6 shadow-lg'>
-          <div className='flex w-full justify-between'>
-            <h2 className='text-lg font-semibold text-neutral-900'>Send OTP</h2>
-            <Button className={'cursor-pointer'} variant='link'>
-              <Link to={'/signup'}>Sign up</Link>
-            </Button>
-          </div>
-          <p className='mt-2 text-sm text-neutral-900'>
-            We will send a one-time password (OTP) to your registered email. Please confirm to proceed.
-          </p>
-          {sendOtp.status === 'pending' ? (
-            <div className='flex items-center gap-4'>
-              <Spinner size='large' className='text-black'>
-                <span className='text-xl text-black'>Sending...</span>
-              </Spinner>
-            </div>
-          ) : (
-            <div>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
-                  <FormField
-                    control={form.control}
-                    name='email'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className={'mt-5 w-full text-neutral-900'}>Email</FormLabel>
-                        <FormControl>
-                          <Input className={'text-neutral-900'} placeholder='Enter your email...' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button className={'w-full'} type='submit'>
-                    Submit
-                  </Button>
-                </form>
-              </Form>
-            </div>
-          )}
+      <div className='w-full max-w-md rounded-lg bg-neutral-100 p-6 shadow-lg'>
+        <div className='flex w-full justify-between'>
+          <h2 className='text-lg font-semibold text-neutral-900'>Send OTP</h2>
+          <Button className={'cursor-pointer'} variant='link'>
+            <Link to={'/signup'}>Sign up</Link>
+          </Button>
         </div>
+        <p className='mt-2 text-sm text-neutral-900'>
+          We will send a one-time password (OTP) to your registered email. Please confirm to proceed.
+        </p>
+        {sendOtp?.status === 'pending' ? (
+          <div className='flex items-center gap-4'>
+            <Spinner size='large' className='text-black'>
+              <span className='text-xl text-black'>Sending...</span>
+            </Spinner>
+          </div>
+        ) : (
+          <div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
+                <FormField
+                  control={form.control}
+                  name='email'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className={'mt-5 w-full text-neutral-900'}>Email</FormLabel>
+                      <FormControl>
+                        <Input className={'text-neutral-900'} placeholder='Enter your email...' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button className={'w-full'} type='submit'>
+                  Submit
+                </Button>
+              </form>
+            </Form>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
 export default SendOtp
-
-// <>
-//   <div className='mt-4'>
-//     <Label htmlFor='email' className='mb-1 block text-sm font-medium text-neutral-700'>
-//       Email Address
-//     </Label>
-//     <Input type='email' id='email' placeholder='Enter your email' className={'text-black'} />
-//   </div>
-//   <div className='mt-4 flex justify-end space-x-3'>
-//     <Button
-//       variant={'default'}
-//       className={'cursor-pointer bg-white text-black hover:bg-white hover:text-black'}
-//     >
-//       Cancel
-//     </Button>
-//     <Button variant={'default'} className={'cursor-pointer'} onClick={handleClick}>
-//       Send OTP
-//     </Button>
-//   </div>
-// </>

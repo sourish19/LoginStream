@@ -4,7 +4,17 @@ import { Routes, Route } from 'react-router-dom'
 import DashboardLayout from '@/layouts/DashboardLayout'
 import AuthLayout from '@/layouts/AuthLayout'
 
-import { Home, Signup, Signin, ForgotPassword, ResetPassword, ChangePassword, SendOtp, OtpVerify } from '../pages'
+import {
+  Home,
+  Protected,
+  Signup,
+  Signin,
+  ForgotPassword,
+  ResetPassword,
+  ChangePassword,
+  SendOtp,
+  OtpVerify
+} from '../pages'
 
 const AppRoutes = () => {
   // const authCheck =
@@ -14,9 +24,11 @@ const AppRoutes = () => {
       <Route
         path='/'
         element={
-          <DashboardLayout>
-            <Home />
-          </DashboardLayout>
+          <Protected>
+            <DashboardLayout>
+              <Home />
+            </DashboardLayout>
+          </Protected>
         }
       />
       <Route
@@ -46,7 +58,14 @@ const AppRoutes = () => {
           </AuthLayout>
         }
       />
-      <Route path='/verify-otp' element={<OtpVerify />} />
+      <Route
+        path='/verify-otp'
+        element={
+          <AuthLayout>
+            <OtpVerify />
+          </AuthLayout>
+        }
+      />
     </Routes>
   )
 }

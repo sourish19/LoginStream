@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -59,7 +59,6 @@ const Signin = () => {
   })
 
   const onSubmit = (data) => {
-    console.log(data)
     dispatch(loginAsync(data))
   }
 
@@ -69,9 +68,11 @@ const Signin = () => {
         <CardHeader>
           <CardTitle>Signin to your account</CardTitle>
           <CardDescription>Enter your credentials to signin to your account</CardDescription>
-          <Button variant={'link'}>
-            <Link to={'/send-otp'}>Send OTP</Link>
-          </Button>
+          <CardAction>
+            <Button variant={'link'}>
+              <Link to={'/send-otp'}>Send OTP</Link>
+            </Button>
+          </CardAction>
         </CardHeader>
         <CardContent>
           <Form {...form}>

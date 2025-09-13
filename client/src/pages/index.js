@@ -6,5 +6,6 @@ import ResetPassword from './ResetPassword'
 import ChangePassword from './ChangePassword'
 import OtpVerify from './OtpVerify'
 import SendOtp from './SendOtp'
+import Protected from './Protected'
 
-export { Home, ForgotPassword, OtpVerify, SendOtp, Signup, Signin, ResetPassword, ChangePassword }
+export { Home, ForgotPassword, OtpVerify, SendOtp, Signup, Signin, ResetPassword, ChangePassword, Protected }

@@ -224,6 +224,7 @@ const authSlice = createSlice({
       })
       .addCase(sendOtpAsync.fulfilled, (state, action) => {
         state.sendOtp.status = 'fulfilled'
+        state.loggedInUser = action.payload?.data
         state.sendOtp.successMessage = action.payload?.message || 'OTP resent successfully'
       })
       .addCase(sendOtpAsync.rejected, (state, action) => {

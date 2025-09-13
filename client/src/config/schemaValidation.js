@@ -21,4 +21,8 @@ const OTPSchema = z.object({
   email: z.email('Invalid email')
 })
 
-export { signupSchema, loginSchema, OTPSchema }
+const verifyOtpSchema = z.object({
+  otp: z.string().min(6, 'OTP must be at least 6 characters')
+})
+
+export { signupSchema, loginSchema, OTPSchema, verifyOtpSchema }
