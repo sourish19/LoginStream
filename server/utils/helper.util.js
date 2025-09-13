@@ -24,7 +24,7 @@ export const generateRandomToken = async () => {
  * @function generateEmailVerificationOTP
  * @returns {Promise<Object>} Object containing unhashedOtp, hashedOtp, and otpExpiry
  */
-export const generateEmailVerificationOTP = async () => {
+export const generateOtp = async () => {
   const unhashedOtp = otpGenerator.generate(6, {
     digits: true,
     upperCaseAlphabets: false,
@@ -75,7 +75,7 @@ export const compareHash = async (unhashedToken, hashedToken) => {
  * @param {number} tokenVersion - Token version for refresh token
  * @returns {Promise<Object>} Object containing accessToken and refreshToken
  */
-export const generateRefreshAccessToken = async (userId, tokenVersion) => {
+export const generateRefreshAccessToken = (userId, tokenVersion) => {
   const accessToken = jwt.sign({ userId }, JWT_CONSTANTS.accessTokenSecret, {
     expiresIn: JWT_CONSTANTS.accessTokenExpiry,
   });

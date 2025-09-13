@@ -20,10 +20,10 @@ const router = Router();
 
 router.post('/register', signupValidation, registerUser);
 router.post('/login', loginValidation, loginUser);
-router.patch('/send-otp', OTPValidation, sendOTP);
-router.patch('/resend-otp', OTPValidation, resendOTP);
-router.patch('/verify-otp', OTPValidation, verifyOTP);
-router.patch('/logout', isLoggedIn, isVerified, logoutUser);
-router.get('/getme'.isLoggedIn, isVerified, getMe);
+router.post('/send-otp', OTPValidation, sendOTP);
+router.post('/resend-otp', OTPValidation, resendOTP);
+router.post('/verify-otp', OTPValidation, verifyOTP);
+router.post('/logout', isLoggedIn, isVerified, logoutUser);
+router.get('/getme', isLoggedIn, isVerified, getMe);
 
 export default router;

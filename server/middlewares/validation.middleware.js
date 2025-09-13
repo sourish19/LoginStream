@@ -9,10 +9,10 @@ import {
 import ApiError from '../utils/apiError.util.js';
 
 // Formating errors
-const getErrors = (zodErr)=>{
-    const flaten = z.flattenError(zodErr)
-    return flaten.fieldErrors
-}
+const getErrors = (zodErr) => {
+  const flaten = z.flattenError(zodErr);
+  return flaten.fieldErrors;
+};
 
 const signupValidation = asyncHandler((req, res, next) => {
   const result = signupSchema.safeParse(req.body);
@@ -24,7 +24,7 @@ const signupValidation = asyncHandler((req, res, next) => {
     next();
   } else {
     logger.error(`Signup attempt failed:`, result.error);
-    throw new ApiError(400,'Validation Error', getErrors(result.error));
+    throw new ApiError(400, 'Validation Error', getErrors(result.error));
   }
 });
 
@@ -47,8 +47,8 @@ const OTPValidation = asyncHandler((req, res, next) => {
     logger.info(`OTP attempt:`);
     next();
   } else {
-    logger.error(`OTP attempt failed:`, result.error);    
-    throw new ApiError(400,'Validation Error', getErrors(result.error));
+    logger.error(`OTP attempt failed:`, result.error);
+    throw new ApiError(400, 'Validation Error', getErrors(result.error));
   }
 });
 

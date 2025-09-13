@@ -3,7 +3,7 @@ import asyncHandler from '../utils/asyncHandler.util.js';
 import ApiError from '../utils/apiError.util.js';
 import ApiResponse from '../utils/apiResponse.util.js';
 import {
-  generateEmailVerificationOTP,
+  generateOtp,
   generateHashedPassword,
   compareHash,
   generateRefreshAccessToken,
@@ -19,13 +19,14 @@ import sanitizeUser from '../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
-const handleOTP = async (user) => {
+const handleOTP = async (user,type,subject,template) => {
+  let updateUser
   const { unhashedOtp, hashedOtp, otpExpiry } =
-    await generateEmailVerificationOTP();
-
+    await generateOtp();
   console.log(unhashedOtp, hashedOtp, otpExpiry);
 
-  const updateUser = await prisma.user.update({
+  if(type === "emailVerification") {
+  updateUser = await prisma.user.update({
     where: {
       email: user?.email,
     },
@@ -34,6 +35,18 @@ const handleOTP = async (user) => {
       emailVerificationOtpExpiry: otpExpiry,
     },
   });
+  }
+  if(type === "resetPassword") {
+  updateUser = await prisma.user.update({
+    where: {
+      email: user?.email,
+    },
+    data: {
+      resetPasswordOtp: hashedOtp,
+      resetPasswordOtpExpiry: otpExpiry,
+    },
+  });
+  }
 
   if (!updateUser) {
     logger.error(`Failed to update user OTP in database for email: ${email}`);
@@ -42,8 +55,8 @@ const handleOTP = async (user) => {
 
   await sendEmail({
     email: user?.email,
-    subject: 'Email Verification',
-    mailgenContent: emailVerificationMailgenContent(
+    subject,
+    mailgenContent: template(
       updateUser?.name,
       unhashedOtp
     ),
@@ -174,7 +187,28 @@ export const loginUser = asyncHandler(async (req, res) => {
 });
 
 export const getMe = asyncHandler(async (req, res) => {
-  // TODO: Implement get me
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email: req.user?.email,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      isVerified: true,
+    },
+  });
+
+  if (!findUser) {
+    logger.warn(`Get me attempt with non-existent email: ${email}`);
+    throw new ApiError(401, 'Invalid email or password', {});
+  }
+
+  const sanitedUser = sanitizeUser(findUser);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, 'User Fetched Successfully', sanitedUser));
 });
 
 /**
@@ -189,6 +223,7 @@ export const getMe = asyncHandler(async (req, res) => {
  * @returns {Promise<void>} Sends verification response
  */
 export const verifyOTP = asyncHandler(async (req, res) => {
+  logger.info('OTP verification attempt');
   const { otp, email } = req.body;
 
   const findUser = await prisma.user.findUnique({
@@ -244,8 +279,8 @@ export const verifyOTP = asyncHandler(async (req, res) => {
 
   //  Set access & refresh token only after signup & after user is verified
   const { accessToken, refreshToken } = generateRefreshAccessToken(
-    updateUser.id,
-    updateUser.tokenVersion
+    updateUser?.id,
+    updateUser?.tokenVersion
   );
 
   const sanitizedUser = sanitizeUser(updateUser);
@@ -294,9 +329,13 @@ export const sendOTP = asyncHandler(async (req, res) => {
     logger.warn(`OTP send attempt for already verified email: ${email}`);
     throw new ApiError(400, 'Email is already verified', {});
   }
-  await handleOTP(findUser);
+  await handleOTP(findUser,"emailVerification","Email Verification",emailVerificationMailgenContent);
 
-  res.status(200).json(new ApiResponse(200, 'OTP sent successfully', {}));
+  const sanitedUser = sanitizeUser(findUser);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, 'OTP sent successfully', sanitedUser));
 });
 
 export const resendOTP = asyncHandler(async (req, res) => {
@@ -411,10 +450,10 @@ export const resetPassword = asyncHandler(async (req, res) => {
   }
 
   const isOtpExpired =
-    Date.now > new Date(findUser.resetPasswordOtpExpiry).getTime();
+    Date.now() > new Date(findUser.resetPasswordOtpExpiry).getTime();
 
   if (isOtpExpired) {
-    logger.error(`OTP expired for email: ${email}`);
+    logger.warn(`OTP expired for email: ${email}`);
     throw new ApiError(400, 'OTP has expired. Please request a new one.', {});
   }
 
@@ -434,6 +473,13 @@ export const resetPassword = asyncHandler(async (req, res) => {
       resetPasswordOtpExpiry: null,
     },
   });
+
+  if(!updateUser){
+    logger.error(`Failed to update user OTP in database for email: ${email}`);
+    throw new ApiError(500, 'Failed to reset password. Please try again later.', {});
+  }
+
+  res.status(200).json(new ApiResponse(200, '',{}))
 });
 
 /**
@@ -479,7 +525,7 @@ export const changeCurrentPassword = asyncHandler(async (req, res) => {
 export const refreshAccessToken = asyncHandler(async (req, res) => {
   if (!req.cookies?.refreshToken) {
     logger.warn('Refresh token not found in cookies');
-    throw new ApiError(401, 'Unauthorized request', {});
+    throw new ApiError(403, 'Forbidden request', {});
   }
 
   const decodedToken = decodeJwtToken(
@@ -489,7 +535,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
   if (!decodedToken) {
     logger.warn(`Invalid refresh token ${decodedToken}`);
-    throw new ApiError(401, 'Unauthorized request', {});
+    throw new ApiError(403, 'Forbidden request', {});
   }
 
   const findUser = await prisma.user.findUnique({
@@ -516,7 +562,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     logger.error(
       `Refresh token attempt for non-existent user: ${findUser.email}`
     );
-    throw new ApiError(401, 'Unauthorized request', {});
+    throw new ApiError(403, 'Forbidden request', {});
   }
 
   const { accessToken, refreshToken } = await generateRefreshAccessToken(
