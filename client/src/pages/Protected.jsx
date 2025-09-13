@@ -1,13 +1,11 @@
-import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router-dom'
-import { loggedInUserSelect } from '@/app/authSlice'
+import AppLoader from '@/layouts/AppLoader'
 
-const Protected = ({ children }) => {
-  const loggedInUser = useSelector(loggedInUserSelect)
-  console.log("Hiiiii --- ", loggedInUser);
-  
-
-  if (loggedInUser?.isVerified) {
+const Protected = ({ children, loggedInUser, isAuthChecked }) => {
+  if (!isAuthChecked) {
+    return <AppLoader />
+  }
+  if (isAuthChecked && loggedInUser?.isVerified) {
     return children
   }
   return <Navigate to={'/signin'} replace={true} />

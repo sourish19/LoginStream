@@ -16,16 +16,18 @@ import { resetSendOtpStatus, clearSendOtpError, clearSendOtpSuccessMessage } fro
 import { OTPSchema } from '@/config/schemaValidation'
 
 const SendOtp = () => {
+  const { loggedInUser, sendOtp } = useSelector((state) => ({
+    loggedInUser: loggedInUserSelect(state),
+    sendOtp: sendOtpSelect(state)
+  }))
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const loggedInUser = useSelector(loggedInUserSelect)
   const form = useForm({
     resolver: zodResolver(OTPSchema),
     defaultValues: {
       email: loggedInUser?.email || ''
     }
   })
-  const sendOtp = useSelector(sendOtpSelect)
 
   // If user is loggedin & verified redirect to /
   useEffect(() => {
@@ -36,9 +38,6 @@ const SendOtp = () => {
 
   // Check sendOtp status & cleanup after first render
   useEffect(() => {
-    if (sendOtp.status === 'pending') {
-      console.log('pending....')
-    }
     if (sendOtp.status === 'fulfilled') {
       toast.success(sendOtp.successMessage)
       navigate('/verify-otp')
@@ -75,36 +74,36 @@ const SendOtp = () => {
         <p className='mt-2 text-sm text-neutral-900'>
           We will send a one-time password (OTP) to your registered email. Please confirm to proceed.
         </p>
-          <div>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
-                <FormField
-                  control={form.control}
-                  name='email'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className={'mt-5 w-full text-neutral-900'}>Email</FormLabel>
-                      <FormControl>
-                        <Input className={'text-neutral-900'} placeholder='Enter your email...' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {sendOtp.status === 'pending' ? (
-                  <div className='flex items-center justify-center'>
-                    <Spinner size='small' className='text-black'>
-                      <span className='text-md text-black'>Sending...</span>
-                    </Spinner>
-                  </div>
-                ) : (
-                  <Button type='submit' className='w-full'>
-                    Submit
-                  </Button>
+        <div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={'mt-5 w-full text-neutral-900'}>Email</FormLabel>
+                    <FormControl>
+                      <Input className={'text-neutral-900'} placeholder='Enter your email...' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </form>
-            </Form>
-          </div>
+              />
+              {sendOtp.status === 'pending' ? (
+                <div className='flex items-center justify-center'>
+                  <Spinner size='small' className='text-black'>
+                    <span className='text-md text-black'>Sending...</span>
+                  </Spinner>
+                </div>
+              ) : (
+                <Button type='submit' className='w-full'>
+                  Submit
+                </Button>
+              )}
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   )

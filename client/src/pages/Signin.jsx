@@ -22,10 +22,12 @@ import {
 } from '@/app/authSlice'
 
 const Signin = () => {
+  const { loggedInUser, login } = useSelector((state) => ({
+    loggedInUser: loggedInUserSelect(state),
+    login: loginSelect(state)
+  }))
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const login = useSelector(loginSelect)
-  const loggedInUser = useSelector(loggedInUserSelect)
 
   // Check if user is logged in or verified
   useEffect(() => {
@@ -114,10 +116,14 @@ const Signin = () => {
                 )}
               />
               {login?.status === 'pending' ? (
-                <Spinner size='small' />
+                <div className='flex items-center justify-center'>
+                  <Spinner size='small' className='text-black'>
+                    <span className='text-md text-black'>Signing in...</span>
+                  </Spinner>
+                </div>
               ) : (
-                <Button type='submit' className='w-full cursor-pointer'>
-                  Signin
+                <Button type={'submit'} className={'w-full'}>
+                  Signup
                 </Button>
               )}
             </form>

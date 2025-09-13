@@ -18,8 +18,10 @@ import { resetSignupStatus, clearSignupError, clearSignupSuccessMessage } from '
 const Signup = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const loggedInUser = useSelector(loggedInUserSelect)
-  const signup = useSelector(signupSelect)
+  const { loggedInUser, signup } = useSelector((state) => ({
+    loggedInUser: loggedInUserSelect(state),
+    signup: signupSelect(state)
+  }))
 
   // Check if user is logged in or verified
   useEffect(() => {
@@ -63,10 +65,7 @@ const Signup = () => {
 
   return (
     <div className='relative z-10 mt-40 flex items-center justify-center'>
-
-    {
-      loggedInUser && !loggedInUser.isVerified ? ( <Spinner /> ) : (
-        <Card className='max-w-sm sm:w-96'>
+      <Card className='max-w-sm sm:w-96'>
         <CardHeader>
           <CardTitle>Create your account</CardTitle>
           <CardDescription>Enter your credentials to create your account</CardDescription>
@@ -119,7 +118,11 @@ const Signup = () => {
                 )}
               />
               {signup?.status === 'pending' ? (
-                <Spinner size='small' />
+                <div className='flex items-center justify-center'>
+                  <Spinner size='small' className='text-black'>
+                    <span className='text-md text-black'>Signing up...</span>
+                  </Spinner>
+                </div>
               ) : (
                 <Button type={'submit'} className={'w-full'}>
                   Signup
@@ -140,9 +143,6 @@ const Signup = () => {
           </CardDescription>
         </CardFooter>
       </Card>
-      )
-    }
-      
     </div>
   )
 }

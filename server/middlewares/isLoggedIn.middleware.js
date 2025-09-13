@@ -44,18 +44,14 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
     select: {
       id: true,
       email: true,
-      tokenVersion: true,
+      isVerified: true,
+      tokenVersion: true
     },
   });
 
   if (!findUser) {
     logger.warn('User not found');
     throw new ApiError(404, 'User not found', {});
-  }
-
-  if (findUser.tokenVersion !== decodedToken.tokenVersion) {
-    logger.warn('Token version mismatch');
-    throw new ApiError(401, 'Unauthorized request', {});
   }
 
   req.user = findUser;

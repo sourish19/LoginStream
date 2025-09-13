@@ -197,7 +197,7 @@ const authSlice = createSlice({
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.login.status = 'fulfilled'
         state.login.successMessage = action.payload?.message
-        state.loggedInUser = action.payload?.user
+        state.loggedInUser = action.payload?.data
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.login.status = 'rejected'
@@ -211,7 +211,7 @@ const authSlice = createSlice({
       .addCase(verifyOtpAsync.fulfilled, (state, action) => {
         state.otpVerification.status = 'fulfilled'
         state.otpVerification.successMessage = action.payload?.message || 'OTP verified'
-        state.loggedInUser = action.payload?.user
+        state.loggedInUser = action.payload?.data || null
       })
       .addCase(verifyOtpAsync.rejected, (state, action) => {
         state.otpVerification.status = 'rejected'
@@ -278,7 +278,7 @@ const authSlice = createSlice({
       })
       .addCase(checkAuthAsync.fulfilled, (state, action) => {
         state.global.status = 'fulfilled'
-        state.loggedInUser = action.payload?.user || null
+        state.loggedInUser = action.payload?.data || null
         state.isAuthChecked = true
       })
       .addCase(checkAuthAsync.rejected, (state, action) => {

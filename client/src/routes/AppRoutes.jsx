@@ -1,5 +1,5 @@
-import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import DashboardLayout from '@/layouts/DashboardLayout'
 import AuthLayout from '@/layouts/AuthLayout'
@@ -15,18 +15,33 @@ import {
   SendOtp,
   OtpVerify
 } from '../pages'
+import { isAuthCheckedSelect, loggedInUserSelect } from '@/app/authSlice'
+import useAuthCheck from '@/hooks/useAuthCheck'
 
 const AppRoutes = () => {
-  // const authCheck =
+  const loggedInUser = useSelector(loggedInUserSelect)
+  const authCheck = useSelector(isAuthCheckedSelect)
+
+  useAuthCheck()
 
   return (
     <Routes>
       <Route
         path='/'
         element={
-          <Protected>
+          <Protected loggedInUser={loggedInUser} isAuthChecked={authCheck}>
             <DashboardLayout>
               <Home />
+            </DashboardLayout>
+          </Protected>
+        }
+      />
+      <Route
+        path='/change-password'
+        element={
+          <Protected loggedInUser={loggedInUser} isAuthChecked={authCheck}>
+            <DashboardLayout>
+              <ChangePassword />
             </DashboardLayout>
           </Protected>
         }
@@ -47,9 +62,22 @@ const AppRoutes = () => {
           </AuthLayout>
         }
       />
-      <Route path='/forgot-password' element={<ForgotPassword />} />
-      <Route path='/reset-password' element={<ResetPassword />} />
-      <Route path='/change-password' element={<ChangePassword />} />
+      <Route
+        path='/forgot-password'
+        element={
+          <AuthLayout>
+            <ForgotPassword />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path='/reset-password'
+        element={
+          <AuthLayout>
+            <ResetPassword />
+          </AuthLayout>
+        }
+      />
       <Route
         path='/send-otp'
         element={

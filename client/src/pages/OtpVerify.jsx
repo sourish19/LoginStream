@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
-import { Form, FormControl,FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import {
   clearOtpVerificationError,
@@ -20,8 +20,10 @@ import {
 import { verifyOtpSchema } from '@/config/schemaValidation'
 
 const OtpVerify = () => {
-  const loggedInUser = useSelector(loggedInUserSelect)
-  const otpVerification = useSelector(otpVerificationSelect)
+  const { loggedInUser, otpVerification } = useSelector((state) => ({
+    loggedInUser: loggedInUserSelect(state),
+    otpVerification: otpVerificationSelect(state)
+  }))
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const form = useForm({
@@ -34,8 +36,6 @@ const OtpVerify = () => {
   // If user is loggedin & verified redirect to /
   useEffect(() => {
     if (loggedInUser && loggedInUser.isVerified) {
-      console.log('Verified');
-      
       navigate('/')
     } else if (!loggedInUser) {
       navigate('/signin')
@@ -121,7 +121,6 @@ const OtpVerify = () => {
               </form>
             </Form>
             <div className='h-full w-full text-center'>
-              (
               <Button variant={'link'}>
                 {' '}
                 <Link to={'/send-otp'}>Didn't receive an OTP? Resend it</Link>{' '}

@@ -75,7 +75,8 @@ const refreshAccessTokenApi = async () => {
 
 const logoutApi = async () => {
   try {
-    const res = await axiosInstance.get('/api/v1/auth/logout')
+    const res = await axiosInstance.post('/api/v1/auth/logout')
+    return res.data
   } catch (error) {
     throw parseError(error)
   }

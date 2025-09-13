@@ -383,7 +383,7 @@ export const resendOTP = asyncHandler(async (req, res) => {
  * @param {Object} res - Express response object
  * @returns {Promise<void>} Sends logout response
  */
-export const logoutUser = asyncHandler(async (req, res) => {
+export const logoutUser = asyncHandler(async (req, res) => { 
   const findUser = await prisma.user.update({
     where: {
       email: req.user?.email,
@@ -401,11 +401,6 @@ export const logoutUser = asyncHandler(async (req, res) => {
   if (!findUser) {
     logger.warn(`Logout attempt for non-existent user: ${req.user?.email}`);
     throw new ApiError(404, 'User not found', {});
-  }
-
-  if (!findUser.isVerified) {
-    logger.warn(`Logout attempt for unverified user: ${req.user?.email}`);
-    throw new ApiError(403, 'Cannot logout unverified user', {});
   }
 
   res
