@@ -36,19 +36,24 @@ const Signin = () => {
     }
   }, [loggedInUser])
 
-  // Check login status & cleanup after first render
+  // Check login status
   useEffect(() => {
     if (login.status === 'fulfilled') {
       toast.success(login.successMessage)
+
+      // CleanUp
+      dispatch(resetLoginStatus())
+      dispatch(clearLoginSuccessMessage())
+      dispatch(clearLoginError())
     } else if (login.status === 'rejected') {
       toast.error(login.error)
-    }
-    return () => {
+
+      //CleanUp
       dispatch(resetLoginStatus())
       dispatch(clearLoginSuccessMessage())
       dispatch(clearLoginError())
     }
-  }, [login])
+  }, [login, dispatch])
 
   const form = useForm({
     resolver: zodResolver(loginSchema),

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
+
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -29,20 +30,23 @@ const Signup = () => {
     }
   }, [loggedInUser])
 
-  // Check signup status & cleanup after first render
+  // Check signup status
   useEffect(() => {
     if (signup.status === 'fulfilled') {
       toast.success(signup.successMessage)
       navigate('/send-otp')
+
+      dispatch(resetSignupStatus())
+      dispatch(clearSignupError())
+      dispatch(clearSignupSuccessMessage())
     } else if (signup.status === 'rejected') {
       toast.error(signup.error)
-    }
-    return () => {
+
       dispatch(resetSignupStatus())
       dispatch(clearSignupError())
       dispatch(clearSignupSuccessMessage())
     }
-  }, [signup])
+  }, [signup, dispatch])
 
   const form = useForm({
     resolver: zodResolver(signupSchema),
@@ -59,7 +63,10 @@ const Signup = () => {
 
   return (
     <div className='relative z-10 mt-40 flex items-center justify-center'>
-      <Card className='max-w-sm sm:w-96'>
+
+    {
+      loggedInUser && !loggedInUser.isVerified ? ( <Spinner /> ) : (
+        <Card className='max-w-sm sm:w-96'>
         <CardHeader>
           <CardTitle>Create your account</CardTitle>
           <CardDescription>Enter your credentials to create your account</CardDescription>
@@ -133,6 +140,9 @@ const Signup = () => {
           </CardDescription>
         </CardFooter>
       </Card>
+      )
+    }
+      
     </div>
   )
 }

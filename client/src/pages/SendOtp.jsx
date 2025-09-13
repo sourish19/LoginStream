@@ -42,10 +42,16 @@ const SendOtp = () => {
     if (sendOtp.status === 'fulfilled') {
       toast.success(sendOtp.successMessage)
       navigate('/verify-otp')
+
+      //CleanUp
+
+      dispatch(resetSendOtpStatus())
+      dispatch(clearSendOtpError())
+      dispatch(clearSendOtpSuccessMessage())
     } else if (sendOtp.status === 'rejected') {
       toast.error(sendOtp.error)
-    }
-    return () => {
+
+      //CleanUp
       dispatch(resetSendOtpStatus())
       dispatch(clearSendOtpError())
       dispatch(clearSendOtpSuccessMessage())
@@ -69,13 +75,6 @@ const SendOtp = () => {
         <p className='mt-2 text-sm text-neutral-900'>
           We will send a one-time password (OTP) to your registered email. Please confirm to proceed.
         </p>
-        {sendOtp?.status === 'pending' ? (
-          <div className='flex items-center gap-4'>
-            <Spinner size='large' className='text-black'>
-              <span className='text-xl text-black'>Sending...</span>
-            </Spinner>
-          </div>
-        ) : (
           <div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
@@ -92,13 +91,20 @@ const SendOtp = () => {
                     </FormItem>
                   )}
                 />
-                <Button className={'w-full'} type='submit'>
-                  Submit
-                </Button>
+                {sendOtp.status === 'pending' ? (
+                  <div className='flex items-center justify-center'>
+                    <Spinner size='small' className='text-black'>
+                      <span className='text-md text-black'>Sending...</span>
+                    </Spinner>
+                  </div>
+                ) : (
+                  <Button type='submit' className='w-full'>
+                    Submit
+                  </Button>
+                )}
               </form>
             </Form>
           </div>
-        )}
       </div>
     </div>
   )

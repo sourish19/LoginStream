@@ -30,7 +30,7 @@ const verifyOtpApi = async (data) => {
 
 const sendOtpApi = async (data) => {
   try {
-    const res = await axiosInstance.patch('/api/v1/auth/send-otp', data)
+    const res = await axiosInstance.post('/api/v1/auth/send-otp', data)
     return res.data
   } catch (error) {
     throw parseError(error)

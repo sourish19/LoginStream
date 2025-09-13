@@ -4,6 +4,8 @@ import { loggedInUserSelect } from '@/app/authSlice'
 
 const Protected = ({ children }) => {
   const loggedInUser = useSelector(loggedInUserSelect)
+  console.log("Hiiiii --- ", loggedInUser);
+  
 
   if (loggedInUser?.isVerified) {
     return children
