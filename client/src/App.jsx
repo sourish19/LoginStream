@@ -1,7 +1,12 @@
+import{ ErrorBoundaryWrapper} from './pages'
 import AppRoutes from './routes/AppRoutes'
 
 function App() {
-  return <AppRoutes />
+  return (
+    <ErrorBoundaryWrapper>
+      <AppRoutes />
+    </ErrorBoundaryWrapper>
+  )
 }
 
 export default App

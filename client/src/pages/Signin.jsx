@@ -123,7 +123,7 @@ const Signin = () => {
                 </div>
               ) : (
                 <Button type={'submit'} className={'w-full'}>
-                  Signup
+                  Sigin
                 </Button>
               )}
             </form>

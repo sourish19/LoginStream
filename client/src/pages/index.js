@@ -7,5 +7,7 @@ import ChangePassword from './ChangePassword'
 import OtpVerify from './OtpVerify'
 import SendOtp from './SendOtp'
 import Protected from './Protected'
+import FallBack from './FallBack'
+import ErrorBoundaryWrapper from './ErrorBoundaryWrapper'
 
-export { Home, ForgotPassword, OtpVerify, SendOtp, Signup, Signin, ResetPassword, ChangePassword, Protected }
+export { Home, ForgotPassword, OtpVerify, SendOtp, Signup, Signin, ResetPassword, ChangePassword, Protected, FallBack, ErrorBoundaryWrapper }

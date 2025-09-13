@@ -3,7 +3,6 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import { Button } from './ui/button'
 
 const Cotainer = ({ title, description, Component, onClick }) => {
-
   return (
     <Card className={'w-[300px] transition-all duration-300'}>
       <CardHeader>

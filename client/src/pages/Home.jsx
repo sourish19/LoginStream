@@ -13,17 +13,16 @@ const Home = () => {
   const loggedInUser = useSelector(loggedInUserSelect)
   const logout = useSelector(logoutSelect)
 
-  useEffect(()=>{
-    if(logout.status === 'fulfilled'){
+  useEffect(() => {
+    if (logout.status === 'fulfilled') {
       navigate('/signin')
-    }
-    else if(logout.status === 'rejected'){
+    } else if (logout.status === 'rejected') {
       navigate('/')
     }
-  },[dispatch])
+  }, [dispatch])
 
-    const handleLogout = ()=>{
-      dispatch(logoutAsync())
+  const handleLogout = () => {
+    dispatch(logoutAsync())
   }
 
   return (
@@ -47,7 +46,12 @@ const Home = () => {
           description='Securely update your account password.'
           Component={<KeyRound />}
         />{' '}
-        <Cotainer title='Logout' description='Sign out from your account safely.' Component={<LogOut />} onClick={handleLogout} />{' '}
+        <Cotainer
+          title='Logout'
+          description='Sign out from your account safely.'
+          Component={<LogOut />}
+          onClick={handleLogout}
+        />{' '}
       </div>
     </div>
   )

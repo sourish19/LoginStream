@@ -15,7 +15,7 @@ const AppLoader = () => {
       />
       <div className='relative z-10 mt-40 flex items-center justify-center'>
         <div className='flex items-center justify-center'>
-          <Spinner size='large' className='text-neutral-50 text-3xl'>
+          <Spinner size='large' className='text-3xl text-neutral-50'>
             <span className='text-2xl text-neutral-50'>Loading...</span>
           </Spinner>
         </div>
