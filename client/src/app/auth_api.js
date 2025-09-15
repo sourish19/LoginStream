@@ -74,12 +74,12 @@ const checkAuthApi = async () => {
 }
 
 const refreshAccessTokenApi = async () => {
-  // try {
-  //   const res = await privateAxiosInstance.get('/api/v1/auth/refresh-token')
-  //   return res.data
-  // } catch (error) {
-  //   throw parseError(error)
-  // }
+  try {    
+    const res = await publicAxiosInstance.get('/api/v1/auth/refresh-access-token')
+    return res.data
+  } catch (error) {
+    throw parseError(error)
+  }
 }
 
 const logoutApi = async () => {

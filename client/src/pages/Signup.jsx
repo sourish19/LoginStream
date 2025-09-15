@@ -18,10 +18,8 @@ import { resetSignupStatus, clearSignupError, clearSignupSuccessMessage } from '
 const Signup = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { loggedInUser, signup } = useSelector((state) => ({
-    loggedInUser: loggedInUserSelect(state),
-    signup: signupSelect(state)
-  }))
+  const signup = useSelector(signupSelect)
+  const loggedInUser = useSelector(loggedInUserSelect)
 
   // Check if user is logged in or verified
   useEffect(() => {

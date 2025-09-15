@@ -22,10 +22,8 @@ import {
 } from '@/app/authSlice'
 
 const Signin = () => {
-  const { loggedInUser, login } = useSelector((state) => ({
-    loggedInUser: loggedInUserSelect(state),
-    login: loginSelect(state)
-  }))
+  const loggedInUser = useSelector(loggedInUserSelect)
+  const login = useSelector(loginSelect)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 

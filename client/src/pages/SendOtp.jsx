@@ -16,10 +16,8 @@ import { resetSendOtpStatus, clearSendOtpError, clearSendOtpSuccessMessage } fro
 import { OTPSchema } from '@/config/schemaValidation'
 
 const SendOtp = () => {
-  const { loggedInUser, sendOtp } = useSelector((state) => ({
-    loggedInUser: loggedInUserSelect(state),
-    sendOtp: sendOtpSelect(state)
-  }))
+  const loggedInUser = useSelector(loggedInUserSelect)
+  const sendOtp = useSelector(sendOtpSelect)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const form = useForm({

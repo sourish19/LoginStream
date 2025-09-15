@@ -1,3 +1,4 @@
+import { refreshAccessTokenApi } from '@/app/auth_api'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
@@ -18,25 +19,22 @@ export const privateAxiosInstance = axios.create({
 })
 
 // Send Token in header for every private route request
-// privateAxiosInstance.interceptors.request.use(
-//   (config) => {
-//     const accessToken = Cookies.get('accessToken')
-//     console.log('ACCESS TOKEN - ', accessToken);
-    
-//     config.headers.Authorization = `Bearer ${accessToken || ''}`
-//     return config
-//   },
-//   (error) => {
-//     return Promise.reject(error)
-//   }
-// )
+privateAxiosInstance.interceptors.request.use(
+  (config) => {
+    const accessToken = Cookies.get('accessToken')
+    console.log('ACCESS TOKEN - ', accessToken);
+    config.headers.Authorization = `Bearer ${accessToken || ''}`
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 privateAxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
-    console.log('ORIGINAL REQUEST - ', originalRequest)
-    console.log('CODE - ', error.response)
     console.log(error.response.data.error.code)
     console.log(error.response.status === 41)
     if (
@@ -50,23 +48,11 @@ privateAxiosInstance.interceptors.response.use(
         if (originalRequest.url?.includes('/refresh-access-token')) {
           return Promise.reject(error)
         }
-        // const refreshToken = Cookies.get('refreshToken')
 
-        // if (!refreshToken) {
-        //   window.location.href = '/signin'
-        //   return Promise.reject(error)
-        // }
+        const res = await refreshAccessTokenApi()
 
-        const res = await publicAxiosInstance.get(
-          '/api/v1/auth/refresh-access-token'
-        )
-        console.log('RES - ', res)
-
-        // const newAccessToken = Cookies.get('accessToken')
-        // originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}` || ''
         return privateAxiosInstance(originalRequest)
       } catch (error) {
-        // Refresh failed redirect to signin
         Cookies.remove('accessToken')
         Cookies.remove('refreshToken')
         window.location.href = '/signin'

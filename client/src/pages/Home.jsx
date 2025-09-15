@@ -6,6 +6,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import Cotainer from '@/components/Container'
 import Wave from '../assets/wave.png'
 import { loggedInUserSelect, logoutAsync, logoutSelect } from '@/app/authSlice'
+import {
+  clearLogoutError,
+  clearLogoutSuccessMessage,
+  resetLogoutStatus
+} from '@/app/authSlice'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -16,8 +21,18 @@ const Home = () => {
   useEffect(() => {
     if (logout.status === 'fulfilled') {
       navigate('/signin')
+
+      // CleanUp
+      dispatch(resetLogoutStatus())
+      dispatch(clearLogoutError())
+      dispatch(clearLogoutSuccessMessage())
     } else if (logout.status === 'rejected') {
       navigate('/')
+
+      // CleanUp
+      dispatch(resetLogoutStatus())
+      dispatch(clearLogoutError())
+      dispatch(clearLogoutSuccessMessage())
     }
   }, [dispatch])
 

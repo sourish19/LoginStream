@@ -20,10 +20,8 @@ import {
 import { verifyOtpSchema } from '@/config/schemaValidation'
 
 const OtpVerify = () => {
-  const { loggedInUser, otpVerification } = useSelector((state) => ({
-    loggedInUser: loggedInUserSelect(state),
-    otpVerification: otpVerificationSelect(state)
-  }))
+  const loggedInUser = useSelector(loggedInUserSelect)
+  const otpVerification = useSelector(otpVerificationSelect)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const form = useForm({
