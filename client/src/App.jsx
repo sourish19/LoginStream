@@ -1,4 +1,4 @@
-import{ ErrorBoundaryWrapper} from './pages'
+import { ErrorBoundaryWrapper } from './pages'
 import AppRoutes from './routes/AppRoutes'
 
 function App() {

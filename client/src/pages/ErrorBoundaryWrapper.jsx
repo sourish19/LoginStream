@@ -3,11 +3,11 @@ import FallBack from './FallBack'
 
 const ErrorBoundaryWrapper = ({ children }) => {
   const handleErrorReset = () => {
-  if (window.location.pathname !== '/') {
-    window.location.href = '/';
-  } else {
-    window.location.reload();
-  }
+    if (window.location.pathname !== '/') {
+      window.location.href = '/'
+    } else {
+      window.location.reload()
+    }
   }
 
   const handleError = (error, errorInfo) => {

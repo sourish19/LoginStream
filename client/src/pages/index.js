@@ -8,6 +8,18 @@ import OtpVerify from './OtpVerify'
 import SendOtp from './SendOtp'
 import Protected from './Protected'
 import FallBack from './FallBack'
-import ErrorBoundaryWrapper from './ErrorBoundaryWrapper'
+import ErrorBoundaryWrapper from './ErrorBoundaryWrapper.jsx'
 
-export { Home, ForgotPassword, OtpVerify, SendOtp, Signup, Signin, ResetPassword, ChangePassword, Protected, FallBack, ErrorBoundaryWrapper }
+export {
+  Home,
+  ForgotPassword,
+  OtpVerify,
+  SendOtp,
+  Signup,
+  Signin,
+  ResetPassword,
+  ChangePassword,
+  Protected,
+  FallBack,
+  ErrorBoundaryWrapper
+}

@@ -1,9 +1,9 @@
-import axiosInstance from '@/config/axios'
+import { publicAxiosInstance, privateAxiosInstance } from '@/config/axios'
 import parseError from '@/config/parseError'
 
 const signupApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/auth/register', data)
+    const res = await publicAxiosInstance.post('/api/v1/auth/register', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -12,7 +12,7 @@ const signupApi = async (data) => {
 
 const loginApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/auth/login', data)
+    const res = await publicAxiosInstance.post('/api/v1/auth/login', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -21,7 +21,7 @@ const loginApi = async (data) => {
 
 const verifyOtpApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/auth/verify-otp', data)
+    const res = await publicAxiosInstance.post('/api/v1/auth/verify-otp', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -30,7 +30,7 @@ const verifyOtpApi = async (data) => {
 
 const sendOtpApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/auth/send-otp', data)
+    const res = await publicAxiosInstance.post('/api/v1/auth/send-otp', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -39,7 +39,7 @@ const sendOtpApi = async (data) => {
 
 const forgotPasswordApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/auth/forgot-password', data)
+    const res = await publicAxiosInstance.post('/api/v1/auth/forgot-password', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -48,16 +48,25 @@ const forgotPasswordApi = async (data) => {
 
 const resetPasswordApi = async (data) => {
   try {
-    const res = await axiosInstance.post('/api/v1/user/reset-password', data)
+    const res = await publicAxiosInstance.post('/api/v1/user/reset-password', data)
     return res.data
   } catch (error) {
     throw parseError(error)
   }
 }
 
+const changePasswordApi = async (data) => {
+  try {
+    const res = await privateAxiosInstance.post('/api/v1/auth/change-password', data)
+    return res.data
+  } catch (error) {
+    return parseError(error)
+  }
+}
+
 const checkAuthApi = async () => {
   try {
-    const res = await axiosInstance.get('/api/v1/auth/getme')
+    const res = await privateAxiosInstance.get('/api/v1/auth/getme')
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -65,17 +74,17 @@ const checkAuthApi = async () => {
 }
 
 const refreshAccessTokenApi = async () => {
-  try {
-    const res = await axiosInstance.get('/api/v1/auth/refresh-token')
-    return res.data
-  } catch (error) {
-    throw parseError(error)
-  }
+  // try {
+  //   const res = await privateAxiosInstance.get('/api/v1/auth/refresh-token')
+  //   return res.data
+  // } catch (error) {
+  //   throw parseError(error)
+  // }
 }
 
 const logoutApi = async () => {
   try {
-    const res = await axiosInstance.post('/api/v1/auth/logout')
+    const res = await privateAxiosInstance.post('/api/v1/auth/logout')
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -89,6 +98,7 @@ export {
   sendOtpApi,
   forgotPasswordApi,
   resetPasswordApi,
+  changePasswordApi,
   checkAuthApi,
   refreshAccessTokenApi,
   logoutApi
