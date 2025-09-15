@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch, useSelector } from 'react-redux'
-import { toast } from 'sonner'
 
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -32,21 +31,15 @@ const Signup = () => {
 
   // Check signup status
   useEffect(() => {
-    if (signup.status === 'fulfilled') {
-      toast.success(signup.successMessage)
-      navigate('/send-otp')
+    if (signup.status === 'fulfilled' || signup.status === 'rejected') {
+      signup.status === 'fulfilled' && navigate('/send-otp')
 
-      dispatch(resetSignupStatus())
-      dispatch(clearSignupError())
-      dispatch(clearSignupSuccessMessage())
-    } else if (signup.status === 'rejected') {
-      toast.error(signup.error)
-
+      // Cleanup
       dispatch(resetSignupStatus())
       dispatch(clearSignupError())
       dispatch(clearSignupSuccessMessage())
     }
-  }, [signup, dispatch, navigate])
+  }, [signup, loggedInUser, dispatch, navigate])
 
   const form = useForm({
     resolver: zodResolver(signupSchema),

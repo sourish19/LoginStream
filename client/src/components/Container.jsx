@@ -1,8 +1,9 @@
 import React from 'react'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Spinner } from './ui/spinner'
 import { Button } from './ui/button'
 
-const Cotainer = ({ title, description, Component, onClick }) => {
+const Cotainer = ({ title, description, Component, onClick, logout }) => {
   return (
     <Card className={'w-[300px] transition-all duration-300'}>
       <CardHeader>
@@ -14,9 +15,17 @@ const Cotainer = ({ title, description, Component, onClick }) => {
         </CardTitle>
         <CardDescription>{description}</CardDescription>
         <CardAction>
-          <Button onClick={onClick} className={'cursor-pointer'} variant='link'>
-            Click Here
-          </Button>
+          {logout && logout.status === 'pending' ? (
+            <div className='flex items-center justify-center'>
+              <Spinner size='small' className='text-black'>
+                <span className='text-md text-black'>Logging out...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <Button onClick={onClick} className={'cursor-pointer'} variant='link'>
+              Click Here
+            </Button>
+          )}
         </CardAction>
       </CardHeader>
     </Card>

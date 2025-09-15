@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { KeyRound, LogOut } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
 
 import Cotainer from '@/components/Container'
 import Wave from '../assets/wave.png'
@@ -16,16 +15,8 @@ const Home = () => {
   const logout = useSelector(logoutSelect)
 
   useEffect(() => {
-    if (logout.status === 'fulfilled') {
-      toast.success(logout.successMessage)
-
-      // CleanUp
-      dispatch(resetLogoutStatus())
-      dispatch(clearLogoutError())
-      dispatch(clearLogoutSuccessMessage())
-    } else if (logout.status === 'rejected') {
-      navigate('/')
-
+    if (logout.status === 'fulfilled' || logout.status === 'rejected') {
+      // Protected component will automatically navigate so no need to navigate here
       // CleanUp
       dispatch(resetLogoutStatus())
       dispatch(clearLogoutError())
@@ -68,6 +59,7 @@ const Home = () => {
           description='Sign out from your account safely.'
           Component={<LogOut />}
           onClick={handleLogout}
+          logout={logout}
         />{' '}
       </div>
     </div>

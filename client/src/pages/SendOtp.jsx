@@ -1,11 +1,10 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
@@ -36,24 +35,14 @@ const SendOtp = () => {
 
   // Check sendOtp status & cleanup after first render
   useEffect(() => {
-    if (sendOtp.status === 'fulfilled') {
-      toast.success(sendOtp.successMessage)
-      navigate('/verify-otp')
-
-      //CleanUp
-
-      dispatch(resetSendOtpStatus())
-      dispatch(clearSendOtpError())
-      dispatch(clearSendOtpSuccessMessage())
-    } else if (sendOtp.status === 'rejected') {
-      toast.error(sendOtp.error)
-
+    if (sendOtp.status === 'fulfilled' || sendOtp.status === 'rejected') {
+      sendOtp.status === 'fulfilled' && navigate('/verify-otp')
       //CleanUp
       dispatch(resetSendOtpStatus())
       dispatch(clearSendOtpError())
       dispatch(clearSendOtpSuccessMessage())
     }
-  }, [sendOtp, navigate])
+  }, [sendOtp, loggedInUser, dispatch, navigate])
 
   // Send OTP api call
   const onSubmit = (data) => {

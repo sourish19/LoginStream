@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { useNavigate, Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -42,23 +41,14 @@ const OtpVerify = () => {
 
   // Check otpVerification status
   useEffect(() => {
-    if (otpVerification.status === 'fulfilled') {
-      toast.success(otpVerification.successMessage)
-      navigate('/')
-
-      // CleanUp
-      dispatch(resetOtpVerificationStatus())
-      dispatch(clearOtpVerificationError())
-      dispatch(clearOtpVerificationSuccessMessage())
-    } else if (otpVerification.status === 'rejected') {
-      toast.error(otpVerification.error)
-
+    if (otpVerification.status === 'fulfilled' || otpVerification.status === 'rejected') {
+      // otpVerification.status === 'fulfilled' && navigate('/')
       // CleanUp
       dispatch(resetOtpVerificationStatus())
       dispatch(clearOtpVerificationError())
       dispatch(clearOtpVerificationSuccessMessage())
     }
-  }, [otpVerification, dispatch, navigate])
+  }, [otpVerification, loggedInUser, dispatch, navigate])
 
   // Submit handler
   const onSubmit = (data) => {

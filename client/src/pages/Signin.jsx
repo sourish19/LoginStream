@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Card, CardContent, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,21 +38,12 @@ const Signin = () => {
   // Check login status
   useEffect(() => {
     if (login.status === 'fulfilled') {
-      toast.success(login.successMessage)
-
       // CleanUp
       dispatch(resetLoginStatus())
       dispatch(clearLoginSuccessMessage())
       dispatch(clearLoginError())
-    } else if (login.status === 'rejected') {
-      toast.error(login.error)
-
-      //CleanUp
-      dispatch(resetLoginStatus())
-      dispatch(clearLoginSuccessMessage())
-      dispatch(clearLoginError())
     }
-  }, [login, dispatch])
+  }, [login, dispatch, navigate])
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -121,7 +111,7 @@ const Signin = () => {
                 </div>
               ) : (
                 <Button type={'submit'} className={'w-full'}>
-                  Sig in
+                  Sign in
                 </Button>
               )}
             </form>

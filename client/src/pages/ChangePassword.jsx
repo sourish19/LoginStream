@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,7 +20,6 @@ import {
 import { updatePasswordSchema } from '@/config/schemaValidation'
 
 const ChangePassword = () => {
-  const navigate = useNavigate()
   const dispatch = useDispatch()
   const loggedInUser = useSelector(loggedInUserSelect)
   const changePassword = useSelector(changePasswordSelect)
@@ -35,23 +32,14 @@ const ChangePassword = () => {
   })
 
   useEffect(() => {
-    if (changePassword.status === 'fulfilled') {
-      toast.success(changePassword.successMessage)
-
-      // Cleanup
-      dispatch(resetChangePasswordStatus())
-      dispatch(clearChangePasswordError())
-      dispatch(clearChangePasswordSuccessMessage())
-    } else if (changePassword.status === 'rejected') {
-      navigate('/')
-      toast.error(changePassword.error)
-
+    if (changePassword.status === 'fulfilled' || changePassword.status === 'rejected') {
+      // Protected component will automatically navigate so no need to navigate here
       // Cleanup
       dispatch(resetChangePasswordStatus())
       dispatch(clearChangePasswordError())
       dispatch(clearChangePasswordSuccessMessage())
     }
-  }, [changePassword, loggedInUser, dispatch, navigate])
+  }, [changePassword, dispatch, loggedInUser])
 
   const onSubmit = (data) => {
     dispatch(changePasswordAsync(data))

@@ -11,6 +11,7 @@ import {
   logoutApi,
   changePasswordApi
 } from './auth_api'
+import { toast } from 'sonner'
 
 const requestState = {
   status: 'idle',
@@ -190,13 +191,15 @@ const authSlice = createSlice({
         state.signup.status = 'fulfilled'
         state.signup.successMessage = action.payload?.message
         state.loggedInUser = action.payload?.data
+        toast.success(state.signup.successMessage)
       })
       .addCase(signupAsync.rejected, (state, action) => {
         state.signup.status = 'rejected'
         state.signup.error = action.error?.message || 'Signup failed'
+        toast.error(state.signup.error)
       })
 
-      // Login
+      // Signin
       .addCase(loginAsync.pending, (state) => {
         state.login.status = 'pending'
       })
@@ -204,10 +207,12 @@ const authSlice = createSlice({
         state.login.status = 'fulfilled'
         state.login.successMessage = action.payload?.message
         state.loggedInUser = action.payload?.data
+        toast.success(state.login.successMessage)
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.login.status = 'rejected'
         state.login.error = action.error?.message || 'Login failed'
+        toast.error(state.login.error)
       })
 
       // Verify OTP
@@ -218,10 +223,12 @@ const authSlice = createSlice({
         state.otpVerification.status = 'fulfilled'
         state.otpVerification.successMessage = action.payload?.message || 'OTP verified'
         state.loggedInUser = action.payload?.data || null
+        toast.success(state.otpVerification.successMessage)
       })
       .addCase(verifyOtpAsync.rejected, (state, action) => {
         state.otpVerification.status = 'rejected'
         state.otpVerification.error = action.error?.message || 'OTP verification failed'
+        toast.error(state.otpVerification.error)
       })
 
       // send OTP
@@ -232,10 +239,12 @@ const authSlice = createSlice({
         state.sendOtp.status = 'fulfilled'
         state.loggedInUser = action.payload?.data
         state.sendOtp.successMessage = action.payload?.message || 'OTP resent successfully'
+        toast.success(state.sendOtp.successMessage)
       })
       .addCase(sendOtpAsync.rejected, (state, action) => {
         state.sendOtp.status = 'rejected'
         state.sendOtp.error = action.error?.message || 'Resend OTP failed'
+        toast.error(state.sendOtp.error)
       })
 
       // Forgot Password
@@ -271,11 +280,13 @@ const authSlice = createSlice({
       .addCase(changePasswordAsync.fulfilled, (state, action) => {
         state.changePassword.status = 'fulfilled'
         state.changePassword.successMessage = action.payload?.message
+        toast.success(state.changePassword.successMessage)
         state.loggedInUser = null
       })
       .addCase(changePasswordAsync.rejected, (state, action) => {
         state.changePassword.status = 'rejected'
         state.changePassword.error = action.error?.message
+        toast.error(state.changePassword.error)
       })
 
       // Logout
@@ -286,10 +297,12 @@ const authSlice = createSlice({
         state.logout.status = 'fulfilled'
         state.logout.successMessage = action.payload?.message || 'Logged out successfully'
         state.loggedInUser = null
+        toast.success(state.logout.successMessage)
       })
       .addCase(logoutAsync.rejected, (state, action) => {
         state.logout.status = 'rejected'
         state.logout.error = action.error?.message || 'Logout failed'
+        toast.error(state.logout.error)
       })
 
       // Check Auth
