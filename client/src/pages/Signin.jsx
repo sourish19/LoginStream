@@ -34,7 +34,7 @@ const Signin = () => {
     } else if (loggedInUser && !loggedInUser.isVerified) {
       navigate('/send-otp')
     }
-  }, [loggedInUser])
+  }, [loggedInUser, navigate])
 
   // Check login status
   useEffect(() => {
@@ -121,7 +121,7 @@ const Signin = () => {
                 </div>
               ) : (
                 <Button type={'submit'} className={'w-full'}>
-                  Sigin
+                  Sig in
                 </Button>
               )}
             </form>

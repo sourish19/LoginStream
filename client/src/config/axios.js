@@ -1,6 +1,6 @@
-import { refreshAccessTokenApi } from '@/app/auth_api'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { refreshAccessTokenApi } from '@/app/auth_api'
 
 export const publicAxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -22,7 +22,6 @@ export const privateAxiosInstance = axios.create({
 privateAxiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = Cookies.get('accessToken')
-    console.log('ACCESS TOKEN - ', accessToken);
     config.headers.Authorization = `Bearer ${accessToken || ''}`
     return config
   },
@@ -31,34 +30,37 @@ privateAxiosInstance.interceptors.request.use(
   }
 )
 
+// Every response is passed through this function, it is mainly used for 401 access-refresh token 
 privateAxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Axios request failed object
     const originalRequest = error.config
-    console.log(error.response.data.error.code)
-    console.log(error.response.status === 41)
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      ['TOKEN_EXPIRED', 'TOKEN_NOT_ACTIVE', 'INVALID_TOKEN'].includes(error.response.data?.error?.code)
+      ['TOKEN_EXPIRED', 'TOKEN_NOT_ACTIVE', 'INVALID_TOKEN'].includes(error.response.data?.error?.code) // JWT expected error
     ) {
-      console.log('hiii')
+      // Retry the request prevent from infinite loop 
       originalRequest._retry = true
+
       try {
-        if (originalRequest.url?.includes('/refresh-access-token')) {
+        // dont refresh during in this route 
+        if (originalRequest.url?.includes('/refresh-access-token')) { 
           return Promise.reject(error)
         }
 
         const res = await refreshAccessTokenApi()
 
+        // Call the previous request with the new access token
         return privateAxiosInstance(originalRequest)
       } catch (error) {
-        Cookies.remove('accessToken')
-        Cookies.remove('refreshToken')
+        // If error means there is no refresh token, redirect to login
         window.location.href = '/signin'
         return Promise.reject(error)
       }
     }
+    // Any other error not related to 401
     return Promise.reject(error)
   }
 )

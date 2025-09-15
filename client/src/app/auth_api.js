@@ -60,7 +60,7 @@ const changePasswordApi = async (data) => {
     const res = await privateAxiosInstance.post('/api/v1/auth/change-password', data)
     return res.data
   } catch (error) {
-    return parseError(error)
+    throw parseError(error)
   }
 }
 
@@ -74,7 +74,7 @@ const checkAuthApi = async () => {
 }
 
 const refreshAccessTokenApi = async () => {
-  try {    
+  try {
     const res = await publicAxiosInstance.get('/api/v1/auth/refresh-access-token')
     return res.data
   } catch (error) {

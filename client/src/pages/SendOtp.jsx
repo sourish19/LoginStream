@@ -32,7 +32,7 @@ const SendOtp = () => {
     if (loggedInUser && loggedInUser.isVerified) {
       navigate('/')
     }
-  }, [loggedInUser])
+  }, [loggedInUser,navigate])
 
   // Check sendOtp status & cleanup after first render
   useEffect(() => {
@@ -53,7 +53,7 @@ const SendOtp = () => {
       dispatch(clearSendOtpError())
       dispatch(clearSendOtpSuccessMessage())
     }
-  }, [sendOtp])
+  }, [sendOtp, navigate])
 
   // Send OTP api call
   const onSubmit = (data) => {

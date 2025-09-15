@@ -6,11 +6,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Cotainer from '@/components/Container'
 import Wave from '../assets/wave.png'
 import { loggedInUserSelect, logoutAsync, logoutSelect } from '@/app/authSlice'
-import {
-  clearLogoutError,
-  clearLogoutSuccessMessage,
-  resetLogoutStatus
-} from '@/app/authSlice'
+import { clearLogoutError, clearLogoutSuccessMessage, resetLogoutStatus } from '@/app/authSlice'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -34,7 +30,7 @@ const Home = () => {
       dispatch(clearLogoutError())
       dispatch(clearLogoutSuccessMessage())
     }
-  }, [dispatch])
+  }, [dispatch, logout, navigate])
 
   const handleLogout = () => {
     dispatch(logoutAsync())
@@ -45,7 +41,7 @@ const Home = () => {
       <div className='text-center'>
         <h1 className='mb-1 text-3xl font-bold tracking-tight sm:mb-3 sm:text-4xl md:text-5xl lg:text-6xl'>
           <span className='flex items-center justify-center gap-4 font-medium transition-all duration-300'>
-            Welcome! {loggedInUser?.name} <img className='h-15 w-15' src={Wave} alt='' />
+            Welcome! {loggedInUser?.name} <img className='h-15 w-15' src={Wave} alt='wave' />
           </span>
         </h1>
         <h2 className='text-center text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl lg:text-4xl'>

@@ -38,7 +38,7 @@ const OtpVerify = () => {
     } else if (!loggedInUser) {
       navigate('/signin')
     }
-  }, [loggedInUser])
+  }, [loggedInUser, navigate])
 
   // Check otpVerification status
   useEffect(() => {
@@ -58,7 +58,7 @@ const OtpVerify = () => {
       dispatch(clearOtpVerificationError())
       dispatch(clearOtpVerificationSuccessMessage())
     }
-  }, [otpVerification, dispatch])
+  }, [otpVerification, dispatch, navigate])
 
   // Submit handler
   const onSubmit = (data) => {
