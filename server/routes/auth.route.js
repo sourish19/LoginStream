@@ -7,6 +7,8 @@ import {
   verifyOTP,
   getMe,
   resendOTP,
+  refreshAccessToken,
+  changeCurrentPassword,
 } from '../controllers/auth.controller.js';
 import isLoggedIn from '../middlewares/isLoggedIn.middleware.js';
 import isVerified from '../middlewares/isVerified.middleware.js';
@@ -14,6 +16,7 @@ import {
   signupValidation,
   loginValidation,
   OTPValidation,
+  changePasswordValidation
 } from '../middlewares/validation.middleware.js';
 
 const router = Router();
@@ -24,6 +27,9 @@ router.post('/send-otp', OTPValidation, sendOTP);
 router.post('/resend-otp', OTPValidation, resendOTP);
 router.post('/verify-otp', OTPValidation, verifyOTP);
 router.post('/logout', isLoggedIn, isVerified, logoutUser);
+router.post('/change-password', isLoggedIn,changePasswordValidation,isVerified, changeCurrentPassword);
+
 router.get('/getme', isLoggedIn, isVerified, getMe);
+router.get('/refresh-access-token', refreshAccessToken);
 
 export default router;

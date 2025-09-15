@@ -28,7 +28,7 @@ const Signup = () => {
     } else if (loggedInUser && !loggedInUser.isVerified) {
       navigate('/send-otp')
     }
-  }, [loggedInUser,navigate])
+  }, [loggedInUser, navigate])
 
   // Check signup status
   useEffect(() => {
@@ -46,7 +46,7 @@ const Signup = () => {
       dispatch(clearSignupError())
       dispatch(clearSignupSuccessMessage())
     }
-  }, [signup, dispatch,navigate])
+  }, [signup, dispatch, navigate])
 
   const form = useForm({
     resolver: zodResolver(signupSchema),

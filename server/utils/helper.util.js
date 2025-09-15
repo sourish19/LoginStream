@@ -44,7 +44,6 @@ export const generateOtp = async () => {
  * @returns {Promise<string|null>} Hashed password or null if invalid input
  */
 export const generateHashedPassword = async (password) => {
-  logger.info(`password in generateHashedPassword fn ${password}`);
   if (!password) return null;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -92,7 +91,13 @@ export const decodeJwtToken = (token, secret) => {
     const decoded = jwt.verify(token, secret);
     return decoded;
   } catch (error) {
-    logger.warn(error.message);
-    return null;
+    logger.warn(error.name);
+    if ((error.name = 'TokenExpiredError')) {
+      return 'TOKEN_EXPIRED';
+    }
+    if (error.name === 'NotBeforeError') {
+      return 'TOKEN_NOT_ACTIVE';
+    }
+    return 'INVALID_TOKEN';
   }
 };

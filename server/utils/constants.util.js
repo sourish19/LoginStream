@@ -5,10 +5,10 @@
 export const cookieOptions = {
   options: {
     sameSite: 'strict',
-    secure: false,
+    secure: true,
     httpOnly: true,
     path: '/',
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    maxAge: 15 * 24 * 60 * 60 * 1000, // 15d
   },
 };
 

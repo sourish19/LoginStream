@@ -5,6 +5,7 @@ import {
   signupSchema,
   loginSchema,
   OTPSchema,
+  changePasswordSchema
 } from '../validators/zod.validator.js';
 import ApiError from '../utils/apiError.util.js';
 
@@ -52,4 +53,16 @@ const OTPValidation = asyncHandler((req, res, next) => {
   }
 });
 
-export { signupValidation, loginValidation, OTPValidation };
+const changePasswordValidation = asyncHandler((req, res, next) => {
+  const result = changePasswordSchema.safeParse(req.body);
+
+  if (result.success) {
+    logger.info(`password update attempt:`);
+    next();
+  } else {
+    logger.error(`change password attempt failed:`, result.error);
+    throw new ApiError(400, 'Validation Error', getErrors(result.error));
+  }
+});
+
+export { signupValidation, loginValidation, OTPValidation, changePasswordValidation };

@@ -32,7 +32,7 @@ const SendOtp = () => {
     if (loggedInUser && loggedInUser.isVerified) {
       navigate('/')
     }
-  }, [loggedInUser,navigate])
+  }, [loggedInUser, navigate])
 
   // Check sendOtp status & cleanup after first render
   useEffect(() => {

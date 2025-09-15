@@ -8,7 +8,8 @@ import {
   resetPasswordApi,
   checkAuthApi,
   refreshAccessTokenApi,
-  logoutApi
+  logoutApi,
+  changePasswordApi
 } from './auth_api'
 
 const requestState = {
@@ -59,6 +60,11 @@ export const forgotPasswordAsync = createAsyncThunk('auth/forgotPasswordAsync', 
 
 export const resetPasswordAsync = createAsyncThunk('auth/resetPasswordAsync', async (data) => {
   const res = await resetPasswordApi(data)
+  return res
+})
+
+export const changePasswordAsync = createAsyncThunk('/auth/changePasswordAsync', async (data) => {
+  const res = await changePasswordApi(data)
   return res
 })
 
@@ -258,6 +264,20 @@ const authSlice = createSlice({
         state.resetPassword.error = action.error?.message || 'Reset password failed'
       })
 
+      // Change Password
+      .addCase(changePasswordAsync.pending, (state) => {
+        state.changePassword.status = 'pending'
+      })
+      .addCase(changePasswordAsync.fulfilled, (state, action) => {
+        state.changePassword.status = 'fulfilled'
+        state.changePassword.successMessage = action.payload?.message
+        state.loggedInUser = null
+      })
+      .addCase(changePasswordAsync.rejected, (state, action) => {
+        state.changePassword.status = 'rejected'
+        state.changePassword.error = action.error?.message
+      })
+
       // Logout
       .addCase(logoutAsync.pending, (state) => {
         state.logout.status = 'pending'
@@ -316,6 +336,9 @@ export const {
   resetResetPasswordStatus,
   clearResetPasswordSuccessMessage,
   clearResetPasswordError,
+  resetChangePasswordStatus,
+  clearChangePasswordError,
+  clearChangePasswordSuccessMessage,
   resetLogoutStatus,
   clearLogoutSuccessMessage,
   clearLogoutError,

@@ -30,7 +30,7 @@ privateAxiosInstance.interceptors.request.use(
   }
 )
 
-// Every response is passed through this function, it is mainly used for 401 access-refresh token 
+// Every response is passed through this function, it is mainly used for 401 access-refresh token
 privateAxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -41,12 +41,12 @@ privateAxiosInstance.interceptors.response.use(
       !originalRequest._retry &&
       ['TOKEN_EXPIRED', 'TOKEN_NOT_ACTIVE', 'INVALID_TOKEN'].includes(error.response.data?.error?.code) // JWT expected error
     ) {
-      // Retry the request prevent from infinite loop 
+      // Retry the request prevent from infinite loop
       originalRequest._retry = true
 
       try {
-        // dont refresh during in this route 
-        if (originalRequest.url?.includes('/refresh-access-token')) { 
+        // dont refresh during in this route
+        if (originalRequest.url?.includes('/refresh-access-token')) {
           return Promise.reject(error)
         }
 

@@ -19,33 +19,31 @@ import sanitizeUser from '../utils/sanitizeUser.js';
 
 const prisma = new PrismaClient();
 
-const handleOTP = async (user,type,subject,template) => {
-  let updateUser
-  const { unhashedOtp, hashedOtp, otpExpiry } =
-    await generateOtp();
-  console.log(unhashedOtp, hashedOtp, otpExpiry);
+const handleOTP = async (user, type, subject, template) => {
+  let updateUser;
+  const { unhashedOtp, hashedOtp, otpExpiry } = await generateOtp();
 
-  if(type === "emailVerification") {
-  updateUser = await prisma.user.update({
-    where: {
-      email: user?.email,
-    },
-    data: {
-      emailVerificationOtp: hashedOtp,
-      emailVerificationOtpExpiry: otpExpiry,
-    },
-  });
+  if (type === 'emailVerification') {
+    updateUser = await prisma.user.update({
+      where: {
+        email: user?.email,
+      },
+      data: {
+        emailVerificationOtp: hashedOtp,
+        emailVerificationOtpExpiry: otpExpiry,
+      },
+    });
   }
-  if(type === "resetPassword") {
-  updateUser = await prisma.user.update({
-    where: {
-      email: user?.email,
-    },
-    data: {
-      resetPasswordOtp: hashedOtp,
-      resetPasswordOtpExpiry: otpExpiry,
-    },
-  });
+  if (type === 'resetPassword') {
+    updateUser = await prisma.user.update({
+      where: {
+        email: user?.email,
+      },
+      data: {
+        resetPasswordOtp: hashedOtp,
+        resetPasswordOtpExpiry: otpExpiry,
+      },
+    });
   }
 
   if (!updateUser) {
@@ -56,10 +54,7 @@ const handleOTP = async (user,type,subject,template) => {
   await sendEmail({
     email: user?.email,
     subject,
-    mailgenContent: template(
-      updateUser?.name,
-      unhashedOtp
-    ),
+    mailgenContent: template(updateUser?.name, unhashedOtp),
   });
 };
 /**
@@ -182,7 +177,10 @@ export const loginUser = asyncHandler(async (req, res) => {
   res
     .status(200)
     .cookie('refreshToken', refreshToken, cookieOptions.options)
-    .cookie('accessToken', accessToken, cookieOptions.options)
+    .cookie('accessToken', accessToken, {
+      ...cookieOptions.options,
+      httpOnly: false,
+    })
     .json(new ApiResponse(200, 'User login successful', sanitizedUser));
 });
 
@@ -288,7 +286,10 @@ export const verifyOTP = asyncHandler(async (req, res) => {
   res
     .status(200)
     .cookie('refreshToken', refreshToken, cookieOptions.options)
-    .cookie('accessToken', accessToken, cookieOptions.options)
+    .cookie('accessToken', accessToken, {
+      ...cookieOptions.options,
+      httpOnly: false,
+    })
     .json(new ApiResponse(200, 'User verification successful', sanitizedUser));
 });
 
@@ -329,7 +330,12 @@ export const sendOTP = asyncHandler(async (req, res) => {
     logger.warn(`OTP send attempt for already verified email: ${email}`);
     throw new ApiError(400, 'Email is already verified', {});
   }
-  await handleOTP(findUser,"emailVerification","Email Verification",emailVerificationMailgenContent);
+  await handleOTP(
+    findUser,
+    'emailVerification',
+    'Email Verification',
+    emailVerificationMailgenContent
+  );
 
   const sanitedUser = sanitizeUser(findUser);
 
@@ -383,7 +389,7 @@ export const resendOTP = asyncHandler(async (req, res) => {
  * @param {Object} res - Express response object
  * @returns {Promise<void>} Sends logout response
  */
-export const logoutUser = asyncHandler(async (req, res) => { 
+export const logoutUser = asyncHandler(async (req, res) => {
   const findUser = await prisma.user.update({
     where: {
       email: req.user?.email,
@@ -469,12 +475,16 @@ export const resetPassword = asyncHandler(async (req, res) => {
     },
   });
 
-  if(!updateUser){
+  if (!updateUser) {
     logger.error(`Failed to update user OTP in database for email: ${email}`);
-    throw new ApiError(500, 'Failed to reset password. Please try again later.', {});
+    throw new ApiError(
+      500,
+      'Failed to reset password. Please try again later.',
+      {}
+    );
   }
 
-  res.status(200).json(new ApiResponse(200, '',{}))
+  res.status(200).json(new ApiResponse(200, '', {}));
 });
 
 /**
@@ -505,6 +515,67 @@ export const forgotPassword = asyncHandler(async (req, res) => {
  */
 export const changeCurrentPassword = asyncHandler(async (req, res) => {
   // TODO: Implement change password logic
+  const { newPassword, currentPassword } = req.body;
+  const findUser = await prisma.user.findUnique({
+    where: {
+      email: req.user?.email,
+    },
+    select: {
+      name: true,
+      email: true,
+      password: true,
+      tokenVersion: true,
+    },
+  });
+
+  if (!findUser) {
+    logger.warn(`User not found for email: ${req.user?.email}`);
+    throw new ApiError(404, 'User not found', {});
+  }
+
+  const isPasswordValid = await compareHash(currentPassword, findUser.password);
+
+  if (!isPasswordValid) {
+    logger.warn(`Invalid password for email: ${req.user?.email}`);
+    throw new ApiError(400, 'Invalid password', {});
+  }
+
+  const newHashedPassword = await generateHashedPassword(newPassword);
+
+  const updateUser = await prisma.user.update({
+    where: {
+      email: findUser.email,
+    },
+    data: {
+      password: newHashedPassword,
+      tokenVersion: findUser.tokenVersion + 1,
+    },
+  });
+
+  if (!updateUser) {
+    logger.error(
+      `Failed to update user password in database for email: ${req.user?.email}`
+    );
+    throw new ApiError(
+      500,
+      'Failed to change password. Please try again later.',
+      {}
+    );
+  }
+
+  const sanitizedUser = sanitizeUser(updateUser);
+
+  res
+    .status(200)
+    .clearCookie('accessToken')
+    .clearCookie('refreshToken')
+    .json(
+      new ApiResponse(
+        200,
+        'Password changed successfully. Please log in',
+        sanitizedUser
+      )
+    );
 });
 
 /**
@@ -518,6 +589,7 @@ export const changeCurrentPassword = asyncHandler(async (req, res) => {
  * @returns {Promise<void>} Sends new access token response
  */
 export const refreshAccessToken = asyncHandler(async (req, res) => {
+  logger.info('Refresh access token');
   if (!req.cookies?.refreshToken) {
     logger.warn('Refresh token not found in cookies');
     throw new ApiError(403, 'Forbidden request', {});
@@ -528,7 +600,11 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     JWT_CONSTANTS.refreshTokenSecret
   );
 
-  if (!decodedToken) {
+  if (
+    decodedToken === 'TOKEN_EXPIRED' ||
+    decodedToken === 'TOKEN_NOT_ACTIVE' ||
+    decodedToken === 'INVALID_TOKEN'
+  ) {
     logger.warn(`Invalid refresh token ${decodedToken}`);
     throw new ApiError(403, 'Forbidden request', {});
   }
@@ -572,7 +648,10 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   res
     .status(200)
     .cookie('refreshToken', refreshToken, cookieOptions.options)
-    .cookie('accessToken', accessToken, cookieOptions.options)
+    .cookie('accessToken', accessToken, {
+      ...cookieOptions.options,
+      httpOnly: false,
+    })
     .json(
       new ApiResponse(
         200,

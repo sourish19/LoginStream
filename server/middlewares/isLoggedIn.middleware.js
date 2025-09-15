@@ -17,6 +17,7 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
   if (req.cookies.accessToken) {
     accessToken = req.cookies?.accessToken;
   }
+
   // if not cookies then check headers
   else if (req.headers['authorization']?.startsWith('Bearer ')) {
     accessToken = req.headers['authorization']?.split(' ')[1];
@@ -32,9 +33,13 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
     JWT_CONSTANTS.accessTokenSecret
   );
 
-  if (!decodedToken) {
-    logger.warn(`Invalid access token ${decodedToken}`);
-    throw new ApiError(401, 'Unauthorized request', {});
+  if (
+    decodedToken === 'TOKEN_EXPIRED' ||
+    decodedToken === 'TOKEN_NOT_ACTIVE' ||
+    decodedToken === 'INVALID_TOKEN'
+  ) {
+    logger.warn(`Token Error - ${decodedToken}`);
+    throw new ApiError(401, 'Unauthorized request', { code: decodedToken });
   }
 
   const findUser = await prisma.user.findUnique({
@@ -45,7 +50,7 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
       id: true,
       email: true,
       isVerified: true,
-      tokenVersion: true
+      tokenVersion: true,
     },
   });
 

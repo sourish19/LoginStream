@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { KeyRound, LogOut } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 import Cotainer from '@/components/Container'
 import Wave from '../assets/wave.png'
@@ -16,7 +17,7 @@ const Home = () => {
 
   useEffect(() => {
     if (logout.status === 'fulfilled') {
-      navigate('/signin')
+      toast.success(logout.successMessage)
 
       // CleanUp
       dispatch(resetLogoutStatus())
@@ -36,6 +37,10 @@ const Home = () => {
     dispatch(logoutAsync())
   }
 
+  const navigateChangePassword = () => {
+    navigate('/change-password')
+  }
+
   return (
     <div className='relative z-1 mt-40 flex h-screen w-full flex-col text-white'>
       <div className='text-center'>
@@ -53,9 +58,10 @@ const Home = () => {
       <div className='mx-auto mt-10 flex flex-col flex-wrap gap-5 sm:flex-row md:flex-row'>
         {' '}
         <Cotainer
-          title='Reset Password'
+          title='Change Password'
           description='Securely update your account password.'
           Component={<KeyRound />}
+          onClick={navigateChangePassword}
         />{' '}
         <Cotainer
           title='Logout'
