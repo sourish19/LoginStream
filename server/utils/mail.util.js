@@ -75,22 +75,17 @@ export const emailVerificationMailgenContent = (username, otp) => ({
  * Generate reset password mailgen content
  * @function resetPasswordMailgenContent
  * @param {string} username - User's name
- * @param {string} resetOtp - Reset OTP or link
+ * @param {string} otp - OTP or link
  * @returns {Object} Mailgen content object
  */
-export const resetPasswordMailgenContent = (username, resetOtp) => ({
+export const resetPasswordMailgenContent = (username, otp) => ({
   body: {
     name: username,
     intro: 'You recently requested to reset your password.',
+    outro: `Use the following OTP to reset your password: **${otp}**. It will expire in 5 minutes.`,
     action: {
-      instructions: 'Click the button below to set a new password:',
-      button: {
-        color: '#22BC66',
-        text: 'Reset Password',
-        link: resetOtp,
-      },
+      instructions:
+        'If you did not request a password reset, please ignore this email or contact support.',
     },
-    outro:
-      'If you did not request a password reset, please ignore this email or contact support if you have concerns.',
   },
 });

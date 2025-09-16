@@ -5,7 +5,7 @@ import {
   signupSchema,
   loginSchema,
   OTPSchema,
-  changePasswordSchema
+  changePasswordSchema,
 } from '../validators/zod.validator.js';
 import ApiError from '../utils/apiError.util.js';
 
@@ -25,7 +25,7 @@ const signupValidation = asyncHandler((req, res, next) => {
     next();
   } else {
     logger.error(`Signup attempt failed:`, result.error);
-    throw new ApiError(400, 'Validation Error', getErrors(result.error));
+    throw new ApiError(422, 'Validation Error', getErrors(result.error));
   }
 });
 
@@ -37,7 +37,7 @@ const loginValidation = asyncHandler((req, res, next) => {
     next();
   } else {
     logger.error(`login attempt failed:`, result.error);
-    throw new ApiError(400, 'Validation Error', getErrors(result.error));
+    throw new ApiError(422, 'Validation Error', getErrors(result.error));
   }
 });
 
@@ -49,7 +49,7 @@ const OTPValidation = asyncHandler((req, res, next) => {
     next();
   } else {
     logger.error(`OTP attempt failed:`, result.error);
-    throw new ApiError(400, 'Validation Error', getErrors(result.error));
+    throw new ApiError(422, 'Validation Error', getErrors(result.error));
   }
 });
 
@@ -61,8 +61,13 @@ const changePasswordValidation = asyncHandler((req, res, next) => {
     next();
   } else {
     logger.error(`change password attempt failed:`, result.error);
-    throw new ApiError(400, 'Validation Error', getErrors(result.error));
+    throw new ApiError(422, 'Validation Error', getErrors(result.error));
   }
 });
 
-export { signupValidation, loginValidation, OTPValidation, changePasswordValidation };
+export {
+  signupValidation,
+  loginValidation,
+  OTPValidation,
+  changePasswordValidation,
+};

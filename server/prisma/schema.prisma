@@ -18,6 +18,8 @@ model User {
   emailVerificationOtpExpiry DateTime?
   resetPasswordOtp           String?
   resetPasswordOtpExpiry     DateTime?
+  token                      String?
+  tokenExpiry                DateTime?
   createdAt                  DateTime  @default(now())
   updatedAt                  DateTime  @updatedAt
 }

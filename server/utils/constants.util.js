@@ -4,8 +4,8 @@
  */
 export const cookieOptions = {
   options: {
-    sameSite: 'strict',
-    secure: true,
+    sameSite: 'lax',
+    secure: false,
     httpOnly: true,
     path: '/',
     maxAge: 15 * 24 * 60 * 60 * 1000, // 15d

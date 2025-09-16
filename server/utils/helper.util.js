@@ -92,7 +92,7 @@ export const decodeJwtToken = (token, secret) => {
     return decoded;
   } catch (error) {
     logger.warn(error.name);
-    if ((error.name = 'TokenExpiredError')) {
+    if (error.name === 'TokenExpiredError') {
       return 'TOKEN_EXPIRED';
     }
     if (error.name === 'NotBeforeError') {

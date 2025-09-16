@@ -3,10 +3,11 @@ import {
   loginUser,
   registerUser,
   logoutUser,
-  sendOTP,
-  verifyOTP,
+  sendEmailVerificationOTP,
+  verifyEmailVerificationOTP,
   getMe,
-  resendOTP,
+  sendOTPforForgotPassword,
+  verifyOTPforForgotPassword,
   refreshAccessToken,
   changeCurrentPassword,
 } from '../controllers/auth.controller.js';
@@ -16,18 +17,30 @@ import {
   signupValidation,
   loginValidation,
   OTPValidation,
-  changePasswordValidation
+  changePasswordValidation,
 } from '../middlewares/validation.middleware.js';
 
 const router = Router();
 
 router.post('/register', signupValidation, registerUser);
 router.post('/login', loginValidation, loginUser);
-router.post('/send-otp', OTPValidation, sendOTP);
-router.post('/resend-otp', OTPValidation, resendOTP);
-router.post('/verify-otp', OTPValidation, verifyOTP);
+router.post('/send-otp', OTPValidation, sendEmailVerificationOTP);
+router.post('/verify-otp', OTPValidation, verifyEmailVerificationOTP);
+router.post(
+  '/forgotPassword/send-otp',
+  OTPValidation,
+  sendOTPforForgotPassword
+);
+router.post('/forgotPassword/verify-otp', OTPValidation, verifyOTPforForgotPassword); //
+
 router.post('/logout', isLoggedIn, isVerified, logoutUser);
-router.post('/change-password', isLoggedIn,changePasswordValidation,isVerified, changeCurrentPassword);
+router.post(
+  '/change-password',
+  isLoggedIn,
+  changePasswordValidation,
+  isVerified,
+  changeCurrentPassword
+);
 
 router.get('/getme', isLoggedIn, isVerified, getMe);
 router.get('/refresh-access-token', refreshAccessToken);

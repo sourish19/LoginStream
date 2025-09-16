@@ -26,12 +26,20 @@ const passwordSchema = z
   .min(4, 'Password must be at least 4 characters')
   .max(20, 'Password must be at most 20 characters');
 
-const changePasswordSchema = z.object({
-  currentPassword: z.string(),
-  newPassword: passwordSchema,
-}).refine((data) => data.currentPassword !== data.newPassword,{
-  message: 'New password must be different',
-  path: ['newPassword']
-})
+const changePasswordSchema = z
+  .object({
+    currentPassword: z.string(),
+    newPassword: passwordSchema,
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: 'New password must be different',
+    path: ['newPassword'],
+  });
 
-export { signupSchema, loginSchema, OTPSchema, passwordSchema, changePasswordSchema };
+export {
+  signupSchema,
+  loginSchema,
+  OTPSchema,
+  passwordSchema,
+  changePasswordSchema,
+};
