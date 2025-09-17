@@ -1,10 +1,11 @@
-import z from 'zod';
+import z, { safeParse } from 'zod';
 import logger from '../logger/winston.logger.js';
 import asyncHandler from '../utils/asyncHandler.util.js';
 import {
   signupSchema,
   loginSchema,
   OTPSchema,
+  validOTPSchema,
   changePasswordSchema,
 } from '../validators/zod.validator.js';
 import ApiError from '../utils/apiError.util.js';
@@ -53,6 +54,18 @@ const OTPValidation = asyncHandler((req, res, next) => {
   }
 });
 
+const validOTPValidation = asyncHandler(async(req,res,next)=>{
+  const result = validOTPSchema.safeParse(req.body)
+  
+  if (result.success) {
+    logger.info(`OTP attempt:`);
+    next();
+  } else {
+    logger.error(`OTP attempt failed:`, result.error);
+    throw new ApiError(422, 'Validation Error', getErrors(result.error));
+  }
+})
+
 const changePasswordValidation = asyncHandler((req, res, next) => {
   const result = changePasswordSchema.safeParse(req.body);
 
@@ -69,5 +82,6 @@ export {
   signupValidation,
   loginValidation,
   OTPValidation,
+  validOTPValidation,
   changePasswordValidation,
 };

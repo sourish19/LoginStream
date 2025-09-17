@@ -21,6 +21,11 @@ const OTPSchema = z.object({
   email: z.email('Invalid email'),
 });
 
+const validOTPSchema = z.object({
+  email: z.email('Invalid email'),
+  otp: z.string().min(6, 'OTP must be at least 6 characters'),
+});
+
 const passwordSchema = z
   .string()
   .min(4, 'Password must be at least 4 characters')
@@ -36,10 +41,12 @@ const changePasswordSchema = z
     path: ['newPassword'],
   });
 
+
 export {
   signupSchema,
   loginSchema,
   OTPSchema,
+  validOTPSchema,
   passwordSchema,
   changePasswordSchema,
 };

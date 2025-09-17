@@ -251,7 +251,6 @@ export const getMe = asyncHandler(async (req, res) => {
  * @returns {Promise<void>} Sends verification response
  */
 export const verifyEmailVerificationOTP = asyncHandler(async (req, res) => {
-  logger.info('OTP verification attempt');
   const { otp, email } = req.body;
 
   const findUser = await prisma.user.findUnique({
@@ -364,11 +363,11 @@ export const sendEmailVerificationOTP = asyncHandler(async (req, res) => {
     emailVerificationMailgenContent
   );
 
-  const sanitedUser = sanitizeUser(findUser);
+  const sanitizedUser = sanitizeUser(findUser);
 
   res
-    .status(204)
-    .json(new ApiResponse(204, 'OTP sent successfully', sanitedUser));
+    .status(200)
+    .json(new ApiResponse(200, 'OTP sent successfully', sanitizedUser));
 });
 
 export const sendOTPforForgotPassword = asyncHandler(async (req, res) => {
@@ -527,7 +526,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
  * @returns {Promise<void>} Sends reset password response
  */
 export const resetPassword = asyncHandler(async (req, res) => {
-  const {resetToken, confirmNewPassword, email } = req.body;
+  const { resetToken, confirmNewPassword, email } = req.body;
 
   const findUser = await prisma.user.findUnique({
     where: {
@@ -538,7 +537,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
       email: true,
       password: true,
       token: true,
-      tokenExpiry: true
+      tokenExpiry: true,
     },
   });
 
@@ -547,16 +546,16 @@ export const resetPassword = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'User not found', {});
   }
 
-  const isTokenExpired = Date.now() > new Date(findUser.tokenExpiry).getTime()
+  const isTokenExpired = Date.now() > new Date(findUser.tokenExpiry).getTime();
 
-  if(isTokenExpired) {
+  if (isTokenExpired) {
     logger.warn(`Reset password attempt for non-existent user: ${email}`);
     throw new ApiError(400, 'Reset token has expired', {});
   }
 
-  const resetTokenValidation = await compareHash(resetToken,findUser.token)
+  const resetTokenValidation = await compareHash(resetToken, findUser.token);
 
-  if(!resetTokenValidation) {
+  if (!resetTokenValidation) {
     logger.warn(`Reset password attempt for non-existent user: ${email}`);
     throw new ApiError(400, 'Invalid reset token', {});
   }
@@ -570,7 +569,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     data: {
       password: hashedPassword,
       token: null,
-      tokenExpiry: null
+      tokenExpiry: null,
     },
     select: {
       name: true,

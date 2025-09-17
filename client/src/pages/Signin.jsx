@@ -61,7 +61,7 @@ const Signin = () => {
     <div className='relative z-10 mt-40 flex items-center justify-center'>
       <Card className='max-w-sm sm:w-96'>
         <CardHeader>
-          <CardTitle>Signin to your account</CardTitle>
+          <CardTitle>Sign in to your account</CardTitle>
           <CardDescription>Enter your credentials to signin to your account</CardDescription>
           <CardAction>
             <Button variant={'link'}>

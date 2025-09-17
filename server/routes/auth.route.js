@@ -17,6 +17,7 @@ import {
   signupValidation,
   loginValidation,
   OTPValidation,
+  validOTPValidation,
   changePasswordValidation,
 } from '../middlewares/validation.middleware.js';
 
@@ -25,13 +26,17 @@ const router = Router();
 router.post('/register', signupValidation, registerUser);
 router.post('/login', loginValidation, loginUser);
 router.post('/send-otp', OTPValidation, sendEmailVerificationOTP);
-router.post('/verify-otp', OTPValidation, verifyEmailVerificationOTP);
+router.post('/verify-otp', validOTPValidation, verifyEmailVerificationOTP);
 router.post(
   '/forgotPassword/send-otp',
   OTPValidation,
   sendOTPforForgotPassword
 );
-router.post('/forgotPassword/verify-otp', OTPValidation, verifyOTPforForgotPassword); //
+router.post(
+  '/forgotPassword/verify-otp',
+  OTPValidation,
+  verifyOTPforForgotPassword
+); //
 
 router.post('/logout', isLoggedIn, isVerified, logoutUser);
 router.post(
