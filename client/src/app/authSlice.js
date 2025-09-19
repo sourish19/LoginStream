@@ -5,6 +5,7 @@ import {
   verifyOtpApi,
   sendOtpApi,
   forgotPasswordApi,
+  forgotPasswordVerify,
   resetPasswordApi,
   checkAuthApi,
   refreshAccessTokenApi,
@@ -27,7 +28,7 @@ const initialState = {
   sendOtp: { ...requestState },
   forgotPassword: { ...requestState },
   resetPassword: { ...requestState },
-  changePassword: { ...requestState }, // TODO: add this in async thunk & other reducer
+  changePassword: { ...requestState },
   logout: { ...requestState },
   loggedInUser: null,
   isAuthChecked: false
@@ -56,6 +57,11 @@ export const sendOtpAsync = createAsyncThunk('auth/sendOtpAsync', async (data) =
 
 export const forgotPasswordAsync = createAsyncThunk('auth/forgotPasswordAsync', async (data) => {
   const res = await forgotPasswordApi(data)
+  return res
+})
+
+export const forgotPasswordVerifyOtpAsync = createAsyncThunk('auth/forgotPasswordVerifyOtpAsync', async (data) => {
+  const res = await forgotPasswordVerify(data)
   return res
 })
 
@@ -247,17 +253,35 @@ const authSlice = createSlice({
         toast.error(state.sendOtp.error)
       })
 
-      // Forgot Password
+      // Forgot Password send OTP
       .addCase(forgotPasswordAsync.pending, (state) => {
         state.forgotPassword.status = 'pending'
       })
       .addCase(forgotPasswordAsync.fulfilled, (state, action) => {
         state.forgotPassword.status = 'fulfilled'
         state.forgotPassword.successMessage = action.payload?.message || 'Reset link sent'
+        state.loggedInUser = action.payload?.data
+        toast.success(state.forgotPassword.successMessage)
       })
       .addCase(forgotPasswordAsync.rejected, (state, action) => {
         state.forgotPassword.status = 'rejected'
         state.forgotPassword.error = action.error?.message || 'Forgot password failed'
+        toast.error(state.forgotPassword.error)
+      })
+
+      // Forgot Password verify OTP
+      .addCase(forgotPasswordVerifyOtpAsync.pending, (state) => {
+        state.forgotPassword.status = 'pending'
+      })
+      .addCase(forgotPasswordVerifyOtpAsync.fulfilled, (state, action) => {
+        state.forgotPassword.status = 'fulfilled'
+        state.forgotPassword.successMessage = action.payload?.message || 'OTP verified'
+        toast.success(state.forgotPassword.successMessage)
+      })
+      .addCase(forgotPasswordVerifyOtpAsync.rejected, (state, action) => {
+        state.forgotPassword.status = 'rejected'
+        state.forgotPassword.error = action.error?.message || 'OTP verification failed'
+        toast.error(state.forgotPassword.error)
       })
 
       // Reset Password

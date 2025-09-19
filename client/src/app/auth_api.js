@@ -39,7 +39,16 @@ const sendOtpApi = async (data) => {
 
 const forgotPasswordApi = async (data) => {
   try {
-    const res = await publicAxiosInstance.post('/api/v1/auth/forgot-password', data)
+    const res = await publicAxiosInstance.post('/api/v1/auth/forgotPassword/send-otp', data)
+    return res.data
+  } catch (error) {
+    throw parseError(error)
+  }
+}
+
+const forgotPasswordVerify = async (data) => {
+  try {
+    const res = await publicAxiosInstance.post('/api/v1/auth/forgotPassword/verify-otp', data)
     return res.data
   } catch (error) {
     throw parseError(error)
@@ -97,6 +106,7 @@ export {
   verifyOtpApi,
   sendOtpApi,
   forgotPasswordApi,
+  forgotPasswordVerify,
   resetPasswordApi,
   changePasswordApi,
   checkAuthApi,

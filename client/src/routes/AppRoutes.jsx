@@ -1,7 +1,5 @@
-import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { Spinner } from '@/components/ui/spinner'
 
 import DashboardLayout from '@/layouts/DashboardLayout'
 import AuthLayout from '@/layouts/AuthLayout'
@@ -9,7 +7,8 @@ import {
   Protected,
   Signup,
   Signin,
-  ForgotPassword,
+  ForgotPasswordOtp,
+  VerifyForgotPasswordOtp,
   ResetPassword,
   ChangePassword,
   SendOtp,
@@ -64,10 +63,18 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path='/forgot-password'
+        path='/forgot-password/send-otp'
         element={
           <AuthLayout>
-            <ForgotPassword />
+            <ForgotPasswordOtp />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path='/forgot-password/verify-otp'
+        element={
+          <AuthLayout>
+            <VerifyForgotPasswordOtp />
           </AuthLayout>
         }
       />

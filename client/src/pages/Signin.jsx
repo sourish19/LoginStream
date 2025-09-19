@@ -92,7 +92,7 @@ const Signin = () => {
                   <FormItem>
                     <div className='flex items-center justify-between'>
                       <FormLabel>Password</FormLabel>
-                      <Link to='/forgot-password' className='text-sm underline-offset-4 hover:underline'>
+                      <Link to='/forgot-password/send-otp' className='text-sm underline-offset-4 hover:underline'>
                         Forgot your password?
                       </Link>
                     </div>
