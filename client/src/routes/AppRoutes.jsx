@@ -13,7 +13,8 @@ import {
   ChangePassword,
   SendOtp,
   OtpVerify,
-  Home
+  Home,
+  NotFound
 } from '../pages'
 import { isAuthCheckedSelect, loggedInUserSelect } from '@/app/authSlice'
 import useAuthCheck from '@/hooks/useAuthCheck'
@@ -102,6 +103,8 @@ const AppRoutes = () => {
           </AuthLayout>
         }
       />
+      {/* Catch-all route for 404 - must be last */}
+      <Route path='*' element={<NotFound />} />
     </Routes>
   )
 }

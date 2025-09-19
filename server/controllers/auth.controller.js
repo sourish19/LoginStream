@@ -406,7 +406,11 @@ export const sendOTPforForgotPassword = asyncHandler(async (req, res) => {
     resetPasswordMailgenContent
   );
 
-  res.status(200).json(new ApiResponse(200, 'OTP sent successfully', {}));
+  const sanitedUser = sanitizeUser(findUser);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, 'OTP sent successfully', sanitedUser));
 });
 
 export const verifyOTPforForgotPassword = asyncHandler(async (req, res) => {
@@ -468,11 +472,14 @@ export const verifyOTPforForgotPassword = asyncHandler(async (req, res) => {
     throw new ApiError(500, 'Unexpected Error', {});
   }
 
-  res
-    .status(200)
-    .json(
-      new ApiResponse(200, 'OTP verified successfully', { resetToken: token })
-    );
+  const sanitedUser = sanitizeUser(updateUser);
+
+  res.status(200).json(
+    new ApiResponse(200, 'OTP verified successfully', {
+      ...sanitedUser,
+      resetToken: token,
+    })
+  );
 });
 
 /**
@@ -526,7 +533,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
  * @returns {Promise<void>} Sends reset password response
  */
 export const resetPassword = asyncHandler(async (req, res) => {
-  const { resetToken, confirmNewPassword, email } = req.body;
+  const { resetToken, confirmPassword, email } = req.body;
 
   const findUser = await prisma.user.findUnique({
     where: {
@@ -560,7 +567,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Invalid reset token', {});
   }
 
-  const hashedPassword = await generateHashedPassword(confirmNewPassword);
+  const hashedPassword = await generateHashedPassword(confirmPassword);
 
   const updateUser = await prisma.user.update({
     where: {

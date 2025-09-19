@@ -40,4 +40,14 @@ const updatePasswordSchema = z
     path: ['newPassword']
   })
 
-export { signupSchema, loginSchema, OTPSchema, verifyOtpSchema, updatePasswordSchema }
+  const resetPasswordSchema = z
+  .object({
+    newPassword: z.string(),
+    confirmPassword: passwordSchema
+  })
+  .refine((data) => data.confirmPassword === data.newPassword, {
+    message: 'Confirm password must be same as new password',
+    path: ['confirmPassword']
+  })
+
+export { signupSchema, loginSchema, OTPSchema, verifyOtpSchema, updatePasswordSchema,resetPasswordSchema }

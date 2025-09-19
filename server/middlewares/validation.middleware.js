@@ -54,9 +54,9 @@ const OTPValidation = asyncHandler((req, res, next) => {
   }
 });
 
-const validOTPValidation = asyncHandler(async(req,res,next)=>{
-  const result = validOTPSchema.safeParse(req.body)
-  
+const validOTPValidation = asyncHandler(async (req, res, next) => {
+  const result = validOTPSchema.safeParse(req.body);
+
   if (result.success) {
     logger.info(`OTP attempt:`);
     next();
@@ -64,7 +64,7 @@ const validOTPValidation = asyncHandler(async(req,res,next)=>{
     logger.error(`OTP attempt failed:`, result.error);
     throw new ApiError(422, 'Validation Error', getErrors(result.error));
   }
-})
+});
 
 const changePasswordValidation = asyncHandler((req, res, next) => {
   const result = changePasswordSchema.safeParse(req.body);

@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import {
-    loggedInUserSelect,
-    forgotPasswordSelect,
+  loggedInUserSelect,
+  forgotPasswordSelect,
   clearForgotPasswordError,
   clearForgotPasswordSuccessMessage,
   resetForgotPasswordStatus,
@@ -30,17 +30,17 @@ const VerifyForgotPasswordOtp = () => {
     }
   })
 
-//   If user is loggedin & verified redirect to 
+  //   If user is loggedin & verified redirect to
   useEffect(() => {
     if (loggedInUser && !loggedInUser.isVerified) {
       navigate('/signup')
-    } 
+    }
   }, [loggedInUser, navigate])
 
   // Check forgotPassword status
   useEffect(() => {
     if (forgotPassword.status === 'fulfilled' || forgotPassword.status === 'rejected') {
-      forgotPassword.status === 'fulfilled' && navigate('/sigin')
+      forgotPassword.status === 'fulfilled' && navigate('/reset-password')
       // CleanUp
       dispatch(resetForgotPasswordStatus())
       dispatch(clearForgotPasswordError())
@@ -114,7 +114,7 @@ const VerifyForgotPasswordOtp = () => {
             </div>
           </div>
         </>
-       )} 
+      )}
     </div>
   )
 }

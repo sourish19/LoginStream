@@ -57,7 +57,7 @@ const forgotPasswordVerify = async (data) => {
 
 const resetPasswordApi = async (data) => {
   try {
-    const res = await publicAxiosInstance.post('/api/v1/user/reset-password', data)
+    const res = await publicAxiosInstance.post('/api/v1/auth/reset-password', data)
     return res.data
   } catch (error) {
     throw parseError(error)

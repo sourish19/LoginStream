@@ -276,6 +276,7 @@ const authSlice = createSlice({
       .addCase(forgotPasswordVerifyOtpAsync.fulfilled, (state, action) => {
         state.forgotPassword.status = 'fulfilled'
         state.forgotPassword.successMessage = action.payload?.message || 'OTP verified'
+        state.loggedInUser = action.payload?.data
         toast.success(state.forgotPassword.successMessage)
       })
       .addCase(forgotPasswordVerifyOtpAsync.rejected, (state, action) => {
@@ -291,10 +292,13 @@ const authSlice = createSlice({
       .addCase(resetPasswordAsync.fulfilled, (state, action) => {
         state.resetPassword.status = 'fulfilled'
         state.resetPassword.successMessage = action.payload?.message || 'Password reset successfully'
+        state.loggedInUser = null
+        toast.success(state.resetPassword.successMessage)
       })
       .addCase(resetPasswordAsync.rejected, (state, action) => {
         state.resetPassword.status = 'rejected'
         state.resetPassword.error = action.error?.message || 'Reset password failed'
+        toast.error(state.resetPassword.error)
       })
 
       // Change Password

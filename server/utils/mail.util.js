@@ -83,9 +83,5 @@ export const resetPasswordMailgenContent = (username, otp) => ({
     name: username,
     intro: 'You recently requested to reset your password.',
     outro: `Use the following OTP to reset your password: **${otp}**. It will expire in 5 minutes.`,
-    action: {
-      instructions:
-        'If you did not request a password reset, please ignore this email or contact support.',
-    },
   },
 });

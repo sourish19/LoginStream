@@ -10,6 +10,7 @@ import {
   verifyOTPforForgotPassword,
   refreshAccessToken,
   changeCurrentPassword,
+  resetPassword,
 } from '../controllers/auth.controller.js';
 import isLoggedIn from '../middlewares/isLoggedIn.middleware.js';
 import isVerified from '../middlewares/isVerified.middleware.js';
@@ -37,7 +38,7 @@ router.post(
   OTPValidation,
   verifyOTPforForgotPassword
 ); //
-
+router.post('/reset-password', resetPassword);
 router.post('/logout', isLoggedIn, isVerified, logoutUser);
 router.post(
   '/change-password',

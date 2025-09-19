@@ -11,13 +11,9 @@ const ErrorBoundaryWrapper = ({ children }) => {
     }
   }
 
-  const handleError = (error, errorInfo) => {
-    // Log error to monitoring service
-    console.error('ErrorBoundaryWrapper caught an error:', error, errorInfo)
-  }
 
   return (
-    <ErrorBoundary FallbackComponent={FallBack} onError={handleError} onReset={handleErrorReset}>
+    <ErrorBoundary FallbackComponent={FallBack} >
       {children}
     </ErrorBoundary>
   )

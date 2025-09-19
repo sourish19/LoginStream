@@ -1,5 +1,5 @@
-import 'dotenv/config';
 import cors from 'cors';
+import 'dotenv/config';
 import express, { urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import logger from './logger/winston.logger.js';

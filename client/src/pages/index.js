@@ -9,7 +9,9 @@ import OtpVerify from './OtpVerify'
 import SendOtp from './SendOtp'
 import Protected from './Protected'
 import FallBack from './FallBack'
-import ErrorBoundaryWrapper from './ErrorBoundaryWrapper.jsx'
+import ErrorBoundaryWrapper from './ErrorBoundaryWrapper'
+import NotFound from './NotFound'
+
 export {
   Home,
   ForgotPasswordOtp,
@@ -22,5 +24,6 @@ export {
   ChangePassword,
   Protected,
   FallBack,
-  ErrorBoundaryWrapper
+  ErrorBoundaryWrapper,
+  NotFound
 }

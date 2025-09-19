@@ -41,7 +41,6 @@ const changePasswordSchema = z
     path: ['newPassword'],
   });
 
-
 export {
   signupSchema,
   loginSchema,

@@ -41,8 +41,7 @@ const ForgotPasswordOtp = () => {
   useEffect(() => {
     if (forgotPassword.status === 'fulfilled' || forgotPassword.status === 'rejected') {
       forgotPassword.status === 'fulfilled' && navigate('/forgot-password/verify-otp')
-      console.log(forgotPassword.status);
-      
+
       //CleanUp
       dispatch(resetForgotPasswordStatus())
       dispatch(clearForgotPasswordError())
