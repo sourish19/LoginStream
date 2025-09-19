@@ -5,7 +5,7 @@
 export const cookieOptions = {
   options: {
     sameSite: 'lax',
-    secure: false,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     path: '/',
     maxAge: 15 * 24 * 60 * 60 * 1000, // 15d
