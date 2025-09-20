@@ -1,8 +1,10 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import Mailgen from 'mailgen';
 
 import { EMAIL_CONSTANTS } from './constants.util.js';
 import logger from '../logger/winston.logger.js';
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const mailGenerator = new Mailgen({
   theme: 'default',
@@ -13,18 +15,6 @@ const mailGenerator = new Mailgen({
     logoHeight: '30px',
     copyright: `© ${new Date().getFullYear()} LoginStream. All rights reserved.`,
   },
-});
-
-const transporter = nodemailer.createTransport({
-  host: EMAIL_CONSTANTS.emailHost,
-  port: parseInt(EMAIL_CONSTANTS.emailPort, 10),
-  secure: false,
-  auth: {
-    user: EMAIL_CONSTANTS.authUser,
-    pass: EMAIL_CONSTANTS.authPass,
-  },
-  logger: true,  // enable logging
-  debug: true,   // show connection debug
 });
 
 /**
@@ -49,7 +39,7 @@ export const sendEmail = async (options) => {
       text: emailText,
       html: emailHtml,
     };
-    await transporter.sendMail(mail);
+    const res = await sgMail.send(mail);
     logger.info(`Email sent to: ${options.email}`);
   } catch (error) {
     // Fail silently
