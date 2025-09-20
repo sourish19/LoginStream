@@ -46,7 +46,6 @@ const OTPValidation = asyncHandler((req, res, next) => {
   const result = OTPSchema.safeParse(req.body);
 
   if (result.success) {
-    logger.info(`OTP attempt:`);
     next();
   } else {
     logger.error(`OTP attempt failed:`, result.error);
@@ -58,7 +57,6 @@ const validOTPValidation = asyncHandler(async (req, res, next) => {
   const result = validOTPSchema.safeParse(req.body);
 
   if (result.success) {
-    logger.info(`OTP attempt:`);
     next();
   } else {
     logger.error(`OTP attempt failed:`, result.error);

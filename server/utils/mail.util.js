@@ -16,13 +16,19 @@ const mailGenerator = new Mailgen({
 });
 
 const transporter = nodemailer.createTransport({
-  host: EMAIL_CONSTANTS.emailHost, 
-  port: parseInt(EMAIL_CONSTANTS.emailPort, 10), 
-  secure: parseInt(EMAIL_CONSTANTS.emailPort, 10) === 465, 
+  host: EMAIL_CONSTANTS.emailHost,
+  port: parseInt(EMAIL_CONSTANTS.emailPort, 10),
+  secure: false, // Use STARTTLS instead of SSL
   auth: {
     user: EMAIL_CONSTANTS.authUser,
     pass: EMAIL_CONSTANTS.authPass,
   },
+  connectionTimeout: 60000, // 60 seconds
+  greetingTimeout: 30000,   // 30 seconds
+  socketTimeout: 60000,     // 60 seconds
+  tls: {
+    rejectUnauthorized: false // For some hosting providers
+  }
 });
 
 /**
@@ -47,9 +53,13 @@ export const sendEmail = async (options) => {
       text: emailText,
       html: emailHtml,
     };
-
-    await transporter.sendMail(mail);
+    console.log("Huuguu ", parseInt(EMAIL_CONSTANTS.emailPort, 10) === 465);
+    
+    const mailSent = await transporter.sendMail(mail);
+    console.log(mailSent);
+    
     logger.info(`Email sent to: ${options.email}`);
+    logger.info(`Email sent: ${mailSent.messageId}`);
   } catch (error) {
     // Fail silently
     logger.error(`Email service failed: ${error.message}`);
