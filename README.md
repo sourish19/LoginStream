@@ -134,6 +134,13 @@ MAILTRAP_PORT="2525"
 MAILTRAP_USERNAME="your_mailtrap_username"
 MAILTRAP_PASSWORD="your_mailtrap_password"
 
+# Production Email Configuration (Port 465 for SMTPS)
+EMAIL_MAIL="your_production_email@domain.com"
+EMAIL_HOST="smtp.your-domain.com"
+EMAIL_PORT="465"
+EMAIL_USERNAME="your_email_username"
+EMAIL_PASSWORD="your_email_password"
+
 # Server Configuration
 PORT=8000
 NODE_ENV="development"

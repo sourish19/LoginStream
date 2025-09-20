@@ -8,12 +8,10 @@ import customErrorResponse from './middlewares/error.middleware.js';
 import healthCheck from './controllers/healthcheck.controller.js';
 
 const app = express();
-console.log("CORS allowed origin:", process.env.FRONTEND_URL);
-
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173',
     credentials: true,
   })
 );

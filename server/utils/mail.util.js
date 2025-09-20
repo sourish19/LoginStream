@@ -16,9 +16,9 @@ const mailGenerator = new Mailgen({
 });
 
 const transporter = nodemailer.createTransport({
-  host: EMAIL_CONSTANTS.emailHost,
-  port: parseInt(EMAIL_CONSTANTS.emailPort, 10),
-  secure: false,
+  host: EMAIL_CONSTANTS.emailHost, 
+  port: parseInt(EMAIL_CONSTANTS.emailPort, 10), 
+  secure: parseInt(EMAIL_CONSTANTS.emailPort, 10) === 465, 
   auth: {
     user: EMAIL_CONSTANTS.authUser,
     pass: EMAIL_CONSTANTS.authPass,
