@@ -2,8 +2,10 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { refreshAccessTokenApi } from '@/app/auth_api'
 
+const isProd = import.meta.env.MODE === "production" // Vite automatically injects a built-in variable
+
 export const publicAxiosInstance = axios.create({
-  baseURL: import.meta.env.ENV_MODE === "production" ? import.meta.env.VITE_BASE_URL : import.meta.env.VITE_DEV_BASE_URL,
+  baseURL: isProd ? import.meta.env.VITE_BASE_URL : import.meta.env.VITE_DEV_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   },
@@ -11,7 +13,7 @@ export const publicAxiosInstance = axios.create({
 })
 
 export const privateAxiosInstance = axios.create({
-  baseURL: import.meta.env.ENV_MODE === "production" ? import.meta.env.VITE_BASE_URL : import.meta.env.VITE_DEV_BASE_URL,
+  baseURL: isProd ? import.meta.env.VITE_BASE_URL : import.meta.env.VITE_DEV_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   },
